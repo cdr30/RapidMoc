@@ -1,0 +1,16 @@
+# Ignore .pyc files
+*.pyc
+
+# Ignore PyDev files
+*.pydevproject
+*.project
+  
+# Ignore emacs tmp files
+*~
+
+# Ignore png files
+*.png
+
+# Other...
+.DS_Store
+
