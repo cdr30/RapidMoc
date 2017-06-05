@@ -4,11 +4,11 @@ xcoord = nav_lon
 ycoord = nav_lat
 zcoord = deptht
 tcoord = time_counter
-i1 = 206
-i2 = 285
-j1 = 190
-j2 = 191
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+i1 = 825
+i2 = 1150
+j1 = 608
+j2 = 609
+maskf = /var/tmp/necr/dat/mesh/ORCA025_Z75/mask.nc
 maskvar = tmask
 maskmdi = 0
 
@@ -18,11 +18,11 @@ xcoord = nav_lon
 ycoord = nav_lat
 zcoord = deptht
 tcoord = time_counter
-i1 = 206
-i2 = 285
-j1 = 190
-j2 = 191
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+i1 = 825
+i2 = 1150
+j1 = 608
+j2 = 609
+maskf = /var/tmp/necr/dat/mesh/ORCA025_Z75/mask.nc
 maskvar = tmask
 maskmdi = 0
 
@@ -32,11 +32,11 @@ xcoord = nav_lon
 ycoord = nav_lat
 zcoord = depthv
 tcoord = time_counter
-i1 = 206
-i2 = 285
-j1 = 190
-j2 = 190
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+i1 = 825
+i2 = 1150
+j1 = 608
+j2 = 608
+maskf = /var/tmp/necr/dat/mesh/ORCA025_Z75/mask.nc
 maskvar = vmask
 maskmdi = 0
 
@@ -45,11 +45,11 @@ var = sozotaux
 xcoord = nav_lon
 ycoord = nav_lat
 tcoord = time_counter
-i1 = 206
-i2 = 285
-j1 = 190
-j2 = 191
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+i1 = 825
+i2 = 1150
+j1 = 608
+j2 = 609
+maskf = /var/tmp/necr/dat/mesh/ORCA025_Z75/mask.nc
 maskvar = umask
 maskmdi = 0
 
@@ -60,7 +60,7 @@ moc_transports=/var/tmp/necr/dat/obs/rapid/volume/2017-06-02/moc_vertical_200404
 time_avg=monthly
 
 [options]
-name=gp69
+name=gp6b
 plot=True
 outdir=/home/rd/necr/tmp/rapidmoc/ 
 georef_level = 4750
@@ -68,7 +68,7 @@ ekman_depth = 50
 # Set longitude boundaries for each component
 fs_minlon = -81.0
 # fs_maxlon -> ORCA025 = -78.4, ORCA1 = -76.0
-fs_maxlon = -76.0
+fs_maxlon = -78.4
 # wbw_maxlon -> ORCA025 = -76.1, ORCA1 = -73.0
-wbw_maxlon = -73.0
+wbw_maxlon = -76.1
 int_maxlon = -10.

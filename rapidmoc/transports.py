@@ -22,12 +22,14 @@ class Transports(object):
         """ Initialize with velocity and temperature sections """
         
         # Initialize data
+        self.name = v.name
         self.v = v.data[:,:,minind:maxind]
         self.t = t_on_v.data[:,:,minind:maxind]
         self.rhocp = RHO_REF * CP
         self.x = v.x[minind:maxind]        
         self.y = v.y[minind:maxind]
         self.z = v.z
+        self.dates = v.dates
         self.dz = v.dz
         self.dz_as_data = v.dz_as_data[:,:,minind:maxind]
         self.dx = v.cell_widths
@@ -174,8 +176,8 @@ def ekman(tau, v, config):
     ek.data = np.zeros_like(v.data)
     
     # Get indices for gyre interior
-    minlon = config.getfloat('rapid_options','wbw_maxlon')
-    maxlon = config.getfloat('rapid_options','int_maxlon')
+    minlon = config.getfloat('options','wbw_maxlon')
+    maxlon = config.getfloat('options','int_maxlon')
     intmin, intmax = utils.get_indrange(tau.x, minlon, maxlon)
 
     # Calculate depth-integrated Ekman transports
@@ -186,7 +188,7 @@ def ekman(tau, v, config):
     ek_trans = ((-1. *  taux / (corf * RHO_REF)) * dx ).sum(axis=1)
 
     # Calculate average velocity over ekman layer
-    ek_level = config.getfloat('rapid_options','ekman_depth')
+    ek_level = config.getfloat('options','ekman_depth')
     ek_minind, ek_maxind = utils.get_indrange(v.z, 0, ek_level)
     dz = v.dz_as_data[0,ek_minind:ek_maxind,intmin:intmax]
     dx = v.cell_widths_as_data[0,ek_minind:ek_maxind,intmin:intmax]
@@ -255,9 +257,9 @@ def rapid_mass_balance(vgeo, ek, config):
     """
     
     # Calculate net transports
-    minlon = config.getfloat('rapid_options', 'fs_minlon')
-    midlon = config.getfloat('rapid_options', 'wbw_maxlon')
-    maxlon = config.getfloat('rapid_options', 'int_maxlon')
+    minlon = config.getfloat('options', 'fs_minlon')
+    midlon = config.getfloat('options', 'wbw_maxlon')
+    maxlon = config.getfloat('options', 'int_maxlon')
     fswbw_tot = section_integral(vgeo, minlon, midlon)
     ek_tot = section_integral(ek, midlon, maxlon)
     int_tot = section_integral(vgeo, midlon, maxlon)
@@ -286,8 +288,8 @@ def total_mass_balance(v):
 
 def merge(vgeo, v, config):
     """ Return geostrophic v merged with model v west of WBW boundary  """
-    minlon = config.getfloat('rapid_options', 'fs_minlon')
-    maxlon = config.getfloat('rapid_options', 'wbw_maxlon')
+    minlon = config.getfloat('options', 'fs_minlon')
+    maxlon = config.getfloat('options', 'wbw_maxlon')
     minind, maxind = utils.get_indrange(vgeo.x, minlon, maxlon)
     vgeo.data[:,:,minind:maxind] = v.data[:,:,minind:maxind]
     

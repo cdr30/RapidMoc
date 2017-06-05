@@ -11,6 +11,8 @@ import copy
 import utils    
 import sections
 import transports
+import plotdiag
+
 
 def get_args():
     """   Get arguments from command line.  """
@@ -58,17 +60,14 @@ def main():
     dh = transports.dynamic_heights(t_on_v, s_on_v)
     
     # Calculate geostrophic transports
-    if config.getboolean('rapid_options', 'geo_approx'):
-        georef = config.getfloat('rapid_options', 'georef_level')
-        vgeo = transports.geostrophic(v, dh, georef=georef)
+    georef = config.getfloat('options', 'georef_level')
+    vgeo = transports.geostrophic(v, dh, georef=georef)
         
-        # Reference geostrophic transports to model velocities
-        if config.has_option('rapid_options', 'vref_level'):
-            vref_level = config.getfloat('rapid_options', 'vref_level') 
-            vgeo = transports.update_reference(vgeo, v, vref_level)
-    else:
-        vgeo = copy.deepcopy(v)
-
+    # Optional reference geostrophic transports to model velocities
+    if config.has_option('options', 'vref_level'):
+        vref_level = config.getfloat('options', 'vref_level') 
+        vgeo = transports.update_reference(vgeo, v, vref_level)
+   
     # Calculate Ekman velocities
     ek = transports.ekman(tau, v, config)
 
@@ -83,15 +82,15 @@ def main():
     vrapid.data = vgeo.data + ek.data
     
     # Get sub-section indices
-    fs_minlon = config.getfloat('rapid_options','fs_minlon')
-    fs_maxlon = config.getfloat('rapid_options','fs_maxlon')
-    wbw_maxlon = config.getfloat('rapid_options','wbw_maxlon')
-    int_maxlon = config.getfloat('rapid_options','int_maxlon')
+    fs_minlon = config.getfloat('options','fs_minlon')
+    fs_maxlon = config.getfloat('options','fs_maxlon')
+    wbw_maxlon = config.getfloat('options','wbw_maxlon')
+    int_maxlon = config.getfloat('options','int_maxlon')
     fsmin, fsmax = utils.get_indrange(vgeo.x, fs_minlon, fs_maxlon)
     wbwmin, wbwmax = utils.get_indrange(vgeo.x, fs_maxlon, wbw_maxlon)
     intmin, intmax = utils.get_indrange(vgeo.x, wbw_maxlon, int_maxlon)
 
-    # Calculate volume and heat transports on each (sub-)section
+    # Get volume and heat transports on each (sub-)section
     fs_trans = transports.Transports(vgeo, t_on_v, fsmin, fsmax)
     wbw_trans = transports.Transports(vgeo, t_on_v, wbwmin, wbwmax)
     int_trans = transports.Transports(vgeo, t_on_v, intmin, intmax)
@@ -99,7 +98,17 @@ def main():
     model_trans = transports.Transports(v, t_on_v, fsmin, intmax)
     rapid_trans = transports.Transports(vrapid, t_on_v, fsmin, intmax)
 
-    # !!! Check CMIP6 integrations !!!
+    # Plot diagnostics
+    if config.getboolean('options','plot'):
+        plotdiag.plot_diagnostics(config, model_trans, rapid_trans, fs_trans,
+                              wbw_trans, int_trans, ek_trans)
+        
+    
+    # Write data to netcdf file
+    import pdb; pdb.set_trace()
+    
+
+    import pdb; pdb.set_trace()
 
     # Check OHT data
     # Save/write data
