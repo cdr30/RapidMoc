@@ -1,62 +1,62 @@
 [temperature]
-var = votemper
-xcoord = nav_lon
-ycoord = nav_lat
-zcoord = deptht
-tcoord = time_counter
+var = thetao
+xcoord = longitude
+ycoord = latitude
+zcoord = lev
+tcoord = time
 i1 = 206
 i2 = 285
 j1 = 190
 j2 = 191
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
-maskvar = tmask
-maskmdi = 0
+#maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+#maskvar = tmask
+#maskmdi = 0
 
 [salinity]
-var = vosaline
-xcoord = nav_lon
-ycoord = nav_lat
-zcoord = deptht
-tcoord = time_counter
+var = so
+xcoord = longitude
+ycoord = latitude
+zcoord = lev
+tcoord = time
 i1 = 206
 i2 = 285
 j1 = 190
 j2 = 191
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
-maskvar = tmask
-maskmdi = 0
+#maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+#maskvar = tmask
+#maskmdi = 0
 
 [meridional_velocity]
-var = vomecrty
-xcoord = nav_lon
-ycoord = nav_lat
-zcoord = depthv
-tcoord = time_counter
+var = vo
+xcoord = longitude
+ycoord = latitude
+zcoord = lev
+tcoord = time
 i1 = 206
 i2 = 285
 j1 = 190
 j2 = 190
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
-maskvar = vmask
-maskmdi = 0
+#maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+#maskvar = vmask
+#maskmdi = 0
 
 [taux]
-var = sozotaux
-xcoord = nav_lon
-ycoord = nav_lat
-tcoord = time_counter
+var = tauuo
+xcoord = longitude
+ycoord = latitude
+tcoord = time
 i1 = 206
 i2 = 285
 j1 = 190
 j2 = 191
-maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
-maskvar = umask
-maskmdi = 0
+#maskf = /var/tmp/necr/dat/mesh/ORCA1_Z75/mask.nc
+#maskvar = umask
+#maskmdi = 0
 
 [observations]
 heat_transports=/var/tmp/necr/dat/obs/rapid/moht/2017-06-02/mocha_mht_data_2014_updated_oct_2015.nc
 volume_transports=/var/tmp/necr/dat/obs/rapid/volume/2017-06-02/moc_transports_200404_20151011.nc
-moc_transports=/var/tmp/necr/dat/obs/rapid/volume/2017-06-02/moc_vertical_200404_20151011.nc
+streamfunctions=/var/tmp/necr/dat/obs/rapid/volume/2017-06-02/moc_vertical_200404_20151011.nc
 time_avg=monthly
 
 [options]

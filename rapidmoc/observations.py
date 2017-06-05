@@ -10,7 +10,7 @@ import abc
 
 
 class TransportObs(object):
-    """ Template class to hold observed ocean transports """
+    """ Template class to interface with observed ocean transports """
     
     def __init__(self, f, time_avg=None, mindt=None, maxdt=None):
         """ Create instance holding ocean transport data """
@@ -91,7 +91,7 @@ class TransportObs(object):
         return data
     
 
-class MocTransportObs(TransportObs):
+class StreamFunctionObs(TransportObs):
     """ 
     Sub-class to hold overturning streamfunction observations
     from the RAPID-MOCHA-WBTS array at 26N.
@@ -118,14 +118,14 @@ class MocTransportObs(TransportObs):
         
         if self.time_avg is None:
             self.dates = self.original_dates
-            self.moc = self._readnc('stream_function_mar').transpose()
+            self.streamfunction = self._readnc('stream_function_mar').transpose()
         elif self.time_avg == 'monthly':
             self.dates = self._mm_dates()
-            self.moc = self._calc_mm(self._readnc('stream_function_mar'),
+            self.streamfunction = self._calc_mm(self._readnc('stream_function_mar'),
                                      profile=True)
         elif self.time_avg == 'yearly':
             self.dates = self._ym_dates()
-            self.moc = self._calc_ym(self._readnc('stream_function_mar'),
+            self.streamfunction = self._calc_ym(self._readnc('stream_function_mar'),
                                      profile=True)
         else:
             print self.time_avg

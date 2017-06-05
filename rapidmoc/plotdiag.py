@@ -23,10 +23,10 @@ def plot_streamfunctions(config, rapid_trans, model_trans, obs_moc):
     fig = plt.figure(figsize=(6,8))
         
     # Plot observations
-    plt.plot(obs_moc.moc.mean(axis=0), -obs_moc.z, '-k', linewidth=4,
+    plt.plot(obs_moc.streamfunction.mean(axis=0), -obs_moc.z, '-k', linewidth=4,
              label='RAPID observations')
     for nt in range(len(obs_moc.dates)):
-        plt.plot(obs_moc.moc[nt,:], -obs_moc.z, '-k', linewidth=0.5,
+        plt.plot(obs_moc.streamfunction[nt,:], -obs_moc.z, '-k', linewidth=0.5,
                  alpha=0.4)
    
    # Plot model data
@@ -140,8 +140,8 @@ def load_observations(config):
     else:
         time_avg = None
 
-    moc = observations.MocTransportObs(
-        config.get('observations', 'moc_transports'), time_avg=time_avg)
+    moc = observations.StreamFunctionObs(
+        config.get('observations', 'streamfunctions'), time_avg=time_avg)
     vol = observations.VolumeTransportObs(
         config.get('observations', 'volume_transports'), time_avg=time_avg)
     oht = observations.HeatTransportObs(

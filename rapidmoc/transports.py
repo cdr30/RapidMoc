@@ -7,6 +7,9 @@ import numpy as np
 import utils
 import copy
 
+import output
+
+import plotdiag
 
 # Constants
 G = 9.81          # Gravitational acceleration (m/s2)
@@ -16,7 +19,7 @@ CP = 3985         # Specific heat capacity of sea water (J/kg/K)
 
     
 class Transports(object):
-    """ Class to calculate volume and heat transport diagnostics """
+    """ Class to interface with volume and heat transport diagnostics """
     
     def __init__(self, v, t_on_v,minind,maxind):
         """ Initialize with velocity and temperature sections """
@@ -168,40 +171,94 @@ class Transports(object):
         return self._oht_by_overturning   
 
 
-def ekman(tau, v, config):
-    """ Return depth-averaged Ekman velocities along section """
-
-    # Copy velocity data structure
-    ek = copy.deepcopy(v)
-    ek.data = np.zeros_like(v.data)
+def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
+    """
+    High-level routine to call transport calculations and return
+    integrated transports on RAPID section as netcdf object
     
-    # Get indices for gyre interior
-    minlon = config.getfloat('options','wbw_maxlon')
-    maxlon = config.getfloat('options','int_maxlon')
-    intmin, intmax = utils.get_indrange(tau.x, minlon, maxlon)
-
-    # Calculate depth-integrated Ekman transports
-    dx = tau.cell_widths_as_data[:,intmin:intmax]
-    lats = tau.y[intmin:intmax]
-    taux = tau.data[:,intmin:intmax]
-    corf = 2 * ROT * np.sin(np.pi * (lats / 180.) ) 
-    ek_trans = ((-1. *  taux / (corf * RHO_REF)) * dx ).sum(axis=1)
-
-    # Calculate average velocity over ekman layer
-    ek_level = config.getfloat('options','ekman_depth')
-    ek_minind, ek_maxind = utils.get_indrange(v.z, 0, ek_level)
-    dz = v.dz_as_data[0,ek_minind:ek_maxind,intmin:intmax]
-    dx = v.cell_widths_as_data[0,ek_minind:ek_maxind,intmin:intmax]
-    ek_area = (dx * dz).sum()
-    ek.data[:,ek_minind:ek_maxind,intmin:intmax] = ek_trans[:,np.newaxis, np.newaxis] / ek_area
-    ek.data = np.ma.MaskedArray(ek.data, mask=v.mask)
-
-    return ek    
-
-
-def geostrophic(v, dh, georef=4750.):
     """ 
-    Return section containing geostrophic transports 
+    # Extract sub-section boundaries
+    fs_minlon = config.getfloat('options','fs_minlon')   # Minimum longitude for Florida Strait
+    fs_maxlon = config.getfloat('options','fs_maxlon')   # Longitude of Florida Strait/WBW boundary
+    wbw_maxlon = config.getfloat('options','wbw_maxlon') # Longitude of WBW/gyre boundary
+    int_maxlon = config.getfloat('options','int_maxlon') # Maximum longitude of gyre interior
+    
+    # Get indices for sub-sections 
+    fsmin, fsmax = utils.get_indrange(v.x, fs_minlon, fs_maxlon)     # Florida Strait
+    wbwmin, wbwmax = utils.get_indrange(v.x, fs_maxlon, wbw_maxlon)  # WBW
+    intmin, intmax = utils.get_indrange(v.x, wbw_maxlon, int_maxlon) # Gyre interior
+    
+    # Calculate dynamic heights
+    dh = calc_dh(t_on_v, s_on_v)
+    
+    # Calculate geostrophic transports
+    georef = config.getfloat('options', 'georef_level')
+    vgeo = calc_vgeo(v, dh, georef=georef)
+        
+    # Optionally reference geostrophic transports to model velocities
+    if config.has_option('options', 'vref_level'):
+        vref_level = config.getfloat('options', 'vref_level') 
+        vgeo = update_georef(vgeo, v, vref_level)
+   
+    # Calculate Ekman velocities
+    ek_level = config.getfloat('options','ekman_depth')
+    ek = calc_ek(v, tau, wbw_maxlon, int_maxlon, ek_level)
+
+    # Use model velocities in FS and WBW regions
+    vgeo = merge_vgeo_and_v(vgeo, v, fs_minlon, wbw_maxlon)
+
+    # Apply mass-balance constraints to section
+    vgeo = rapid_mass_balance(vgeo, ek, fs_minlon, wbw_maxlon, int_maxlon)
+
+    # Add ekman to geostrophic transports for combined rapid velocities
+    vrapid = copy.deepcopy(vgeo)
+    vrapid.data = vgeo.data + ek.data
+    
+    # Get volume and heat transports on each (sub-)section
+    fs_trans = Transports(vgeo, t_on_v, fsmin, fsmax)        # Florida strait transports
+    wbw_trans = Transports(vgeo, t_on_v, wbwmin, wbwmax)     # Western-boundary wedge transports
+    int_trans = Transports(vgeo, t_on_v, intmin, intmax)     # Gyre interior transports
+    ek_trans = Transports(ek, t_on_v, intmin, intmax)        # Ekman transports
+    model_trans = Transports(v, t_on_v, fsmin, intmax)       # Total section transports using model velocities
+    rapid_trans = Transports(vrapid, t_on_v, fsmin, intmax)  # Total section transports using RAPID approximation
+
+    plotdiag.plot_diagnostics(config, model_trans, rapid_trans, fs_trans,
+                                wbw_trans, int_trans, ek_trans)
+    
+    import pdb; pdb.set_trace()
+    # Create netcdf object holding all transport data for plotting and output
+    
+    trans = output.create_netcdf(rapid_trans, model_trans, fs_trans, 
+                                      wbw_trans, int_trans, ek_trans)
+    
+    return trans
+    
+
+def calc_dh(t_on_v, s_on_v):
+    """ 
+    Return ZonalSections containing dynamic heights calculated from 
+    from temperature and salinity interpolated onto velocity boundaries. 
+   
+    """
+    # Calculate in situ density at bounds
+    rho = copy.deepcopy(t_on_v)
+    rho.data = None # Density not needed at v mid-points
+    rho.bounds_data = eos_insitu(t_on_v.bounds_data, s_on_v.bounds_data,
+                                 t_on_v.z_as_bounds_data)
+
+    # Calculate dynamic height relative to a reference level
+    dh = copy.deepcopy(rho)
+    rho_anom = (rho.bounds_data - RHO_REF) / RHO_REF
+    # Depth axis reversed for integral from sea-floor. 
+    dh.bounds_data = np.cumsum((rho_anom * rho.dz_as_bounds_data)[:,::-1,:],
+                                axis=1)[:,::-1,:]
+
+    return dh
+
+
+def calc_vgeo(v, dh, georef=4750.):
+    """ 
+    Return ZonalSections containing geostrophic velocities 
     relative to specified reference level. 
     
     """
@@ -238,6 +295,57 @@ def geostrophic(v, dh, georef=4750.):
             
     return vgeo
 
+
+def update_georef(vgeo, v, vref_level):
+    """ 
+    Return vgeo after updating geostrophic reference depth by constraining
+    velocities in vgeo to match those in v at the specified depth.
+    
+    """
+    vgeodat = vgeo.data.filled(0)
+    vdat = v.data.filled(0)
+    zind = utils.find_nearest(v.z,vref_level)
+    vadj = np.ones_like(vgeodat) * (vdat[:,zind,:] - vgeodat[:,zind,:])
+    vgeo.data = np.ma.MaskedArray(vgeo.data + vadj, mask=vgeo.mask)
+    
+    return vgeo
+
+
+def calc_ek(v, tau, minlon, maxlon, ek_level):
+    """ Return ZonalSections containing Ekman velocities """
+
+    # Copy velocity data structure
+    ek = copy.deepcopy(v)
+    ek.data = np.zeros_like(v.data)
+    
+    # Get indices for gyre interior
+    intmin, intmax = utils.get_indrange(tau.x, minlon, maxlon)
+
+    # Calculate depth-integrated Ekman transports
+    dx = tau.cell_widths_as_data[:,intmin:intmax]
+    lats = tau.y[intmin:intmax]
+    taux = tau.data[:,intmin:intmax]
+    corf = 2 * ROT * np.sin(np.pi * (lats / 180.) ) 
+    ek_trans = ((-1. *  taux / (corf * RHO_REF)) * dx ).sum(axis=1)
+
+    # Calculate average velocity over ekman layer
+    ek_minind, ek_maxind = utils.get_indrange(v.z, 0, ek_level)
+    dz = v.dz_as_data[0,ek_minind:ek_maxind,intmin:intmax]
+    dx = v.cell_widths_as_data[0,ek_minind:ek_maxind,intmin:intmax]
+    ek_area = (dx * dz).sum()
+    ek.data[:,ek_minind:ek_maxind,intmin:intmax] = ek_trans[:,np.newaxis, np.newaxis] / ek_area
+    ek.data = np.ma.MaskedArray(ek.data, mask=v.mask)
+
+    return ek    
+
+
+def merge_vgeo_and_v(vgeo, v, minlon, maxlon):
+    """ Return vgeo with velocities from v west of lonbnd """
+    minind, maxind = utils.get_indrange(vgeo.x, minlon, maxlon)
+    vgeo.data[:,:,minind:maxind] = v.data[:,:,minind:maxind]
+    
+    return vgeo
+
     
 def section_integral(v, xmin, xmax):
     """ Section integral between x values """
@@ -250,16 +358,13 @@ def section_integral(v, xmin, xmax):
         return np.sum(v.data[:,:,minind:maxind] * da , axis=(1,2))
         
 
-def rapid_mass_balance(vgeo, ek, config):
+def rapid_mass_balance(vgeo, ek, minlon, midlon, maxlon):
     """ 
-    Apply RAPID-stlpe mass-balance constraint as a barotropic
-    velocity over geostrophic interior
+    Return vgeo after applying RAPID-style mass-balance constraint
+    as a barotropic velocity over geostrophic interior
     """
     
     # Calculate net transports
-    minlon = config.getfloat('options', 'fs_minlon')
-    midlon = config.getfloat('options', 'wbw_maxlon')
-    maxlon = config.getfloat('options', 'int_maxlon')
     fswbw_tot = section_integral(vgeo, minlon, midlon)
     ek_tot = section_integral(ek, midlon, maxlon)
     int_tot = section_integral(vgeo, midlon, maxlon)
@@ -273,7 +378,8 @@ def rapid_mass_balance(vgeo, ek, config):
 
     # Correct geostrophic transports in gyre interior
     corr = net / da.sum()
-    vgeo.data[:,:,minind:maxind] = vgeo.data[:,:,minind:maxind] - corr[:,np.newaxis,np.newaxis]
+    vgeo.data[:,:,minind:maxind] = (vgeo.data[:,:,minind:maxind] -
+                                    corr[:,np.newaxis,np.newaxis])
     
     return vgeo
 
@@ -281,55 +387,10 @@ def rapid_mass_balance(vgeo, ek, config):
 def total_mass_balance(v):
     """ Apply mass balance evenly across entire section """
     da =  v.cell_widths_as_data * v.dz_as_data
-    v.data = v.data - ((v.data * da).sum(axis=(1,2)) / da.sum(axis=(1,2)))[:,np.newaxis,np.newaxis]
+    v.data = (v.data - ((v.data * da).sum(axis=(1,2)) / 
+                        da.sum(axis=(1,2)))[:,np.newaxis,np.newaxis])
     
     return v
-    
-
-def merge(vgeo, v, config):
-    """ Return geostrophic v merged with model v west of WBW boundary  """
-    minlon = config.getfloat('options', 'fs_minlon')
-    maxlon = config.getfloat('options', 'wbw_maxlon')
-    minind, maxind = utils.get_indrange(vgeo.x, minlon, maxlon)
-    vgeo.data[:,:,minind:maxind] = v.data[:,:,minind:maxind]
-    
-    return vgeo
-
-
-def update_reference(vgeo, v, vref_level):
-    """ 
-    Reference geostrophic velocities to model 
-    velocities at the specified depth 
-    
-    """
-    vgeodat = vgeo.data.filled(0)
-    vdat = v.data.filled(0)
-    zind = utils.find_nearest(v.z,vref_level)
-    vadj = np.ones_like(vgeodat) * (vdat[:,zind,:] - vgeodat[:,zind,:])
-    vgeo.data = np.ma.MaskedArray(vgeo.data + vadj, mask=vgeo.mask)
-    
-    return vgeo
-
-
-def dynamic_heights(t_on_v, s_on_v):
-    """ 
-    Return dynamic heights along section calculated from 
-    from temp and sal interpolated onto velocity bounds 
-   
-    """
-    
-    # Calculate in situ density at bounds
-    rho = copy.deepcopy(t_on_v)
-    rho.data = None # Density not needed at v mid-points
-    rho.bounds_data = eos_insitu(t_on_v.bounds_data,s_on_v.bounds_data,t_on_v.z_as_bounds_data)
-
-    # Calculate dynamic height relative to a reference level
-    dh = copy.deepcopy(rho)
-    rho_anom = (rho.bounds_data - RHO_REF) / RHO_REF
-    # Depth axis reversed for integral from sea-floor. 
-    dh.bounds_data = np.cumsum((rho_anom * rho.dz_as_bounds_data)[:,::-1,:],axis=1)[:,::-1,:]
-
-    return dh
 
 
 def eos_insitu(t, s, p):
@@ -343,7 +404,7 @@ def eos_insitu(t, s, p):
     # Convert to double precision
     ptem = np.double(t)    # potential temperature (celcius)
     psal = np.double(s)    # salintiy (psu)
-    depth = np.double(p)    # depth (m)
+    depth = np.double(p)   # pressure (decibar) = depth (m)
     rau0 = np.double(1035) # volumic mass of reference (kg/m3)
 
     # Read into eos_insitu.f90 varnames  

@@ -16,8 +16,7 @@ class ShapeError(Exception):
 
 class ZonalSections(object):
     """ 
-    Class to hold data and metadata corresponding to zonal 
-    sections
+    Class to interface with zonal section data.
     
     ** Assumptions **
     
@@ -318,9 +317,15 @@ class ZonalSections(object):
         
         if ncvar.ndim == 2:
             self.x = ncvar[self.j1:self.j2+1,self.i1:self.i2+1]
+            
         else:
             # Dummy j-index for averaging
             self.x = ncvar[self.i1:self.i2+1][np.newaxis] 
+            
+        # Set range -180 to 180
+        if self.x.max() > 180:
+            self.x[self.x > 180] = self.x[self.x > 180] - 360
+
         nc.close()
         
     def _read_ycoord(self):
