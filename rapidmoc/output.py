@@ -2,11 +2,14 @@
 Module containing code to generate netcdf object for output.
  
 """
+
  
 from netCDF4 import Dataset, date2num
-import utils
 import numpy as np
 import os
+
+import utils
+
                
 def open_ncfile(config, dates):
     """ Return handle for netcdf file """

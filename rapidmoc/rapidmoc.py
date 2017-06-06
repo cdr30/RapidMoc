@@ -3,16 +3,17 @@ Module containing main routines to execute RapidMoc
 
 """
 
+
 import argparse
 import ConfigParser
-import matplotlib.pyplot as plt
 import copy
 
-import utils    
+
 import sections
 import transports
 import observations
 import plotdiag
+
 
 def get_args():
     """   Get arguments from command line.  """

@@ -3,6 +3,7 @@ Module containing code to plot volume and heat transport diagnostics
 
 """
 
+
 import matplotlib
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
@@ -16,7 +17,6 @@ import utils
 
 
 # COLORS 
-
 c1='#a6cee3'
 c2='#1f78b4'
 c3='#b2df8a'

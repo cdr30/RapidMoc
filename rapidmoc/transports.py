@@ -3,11 +3,13 @@ Module containing code to work with ocean transports
 
 """
 
+
 import numpy as np
-import utils
 import copy
 
 import output
+import utils
+
 
 # Constants
 G = 9.81          # Gravitational acceleration (m/s2)
