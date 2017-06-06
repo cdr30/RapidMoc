@@ -6,18 +6,34 @@ Module containing utility functions
 
 import numpy as np
 import os
+from netCDF4 import num2date
 
 class ShapeError(Exception):
     pass
 
 
-def get_savename(config, dates, suffix):
+
+def get_ncdates(nc, tvar='time'):
+    """ Return dates from nercdf time coordinate """
+    t = nc.variables[tvar]
+    dts = num2date(t[:], t.units, calendar=t.calendar)
+    
+    return dts
+
+
+def get_datestr(dates, date_format):
+    """ Return string of form 'mindate-maxdate' for specified format """
+    datestr = '%s-%s' % (dates.min().strftime(date_format), 
+                        dates.max().strftime(date_format))
+    
+    return datestr
+
+
+def get_savename(outdir, name, dates, date_format, suffix=''):
     """ Return savename for output file """
-    mindt = dates.min().strftime('%Y%m%d')
-    maxdt = dates.max().strftime('%Y%m%d')
-    outdir = config.get('options', 'outdir')
-    name = config.get('options', 'name')
-    savename = os.path.join(outdir,'%s_%s-%s%s' % (name, mindt, maxdt, suffix))
+    datestr = get_datestr(dates, date_format)
+    savename = os.path.join(outdir,'%s_%s%s' % (name, datestr, suffix))
+    
     return savename
 
 
@@ -25,6 +41,7 @@ def get_daterange(dates1, dates2):
     """ Return min and max date range for overlapping period """
     mindt = max([dates1.min(),dates2.min()])
     maxdt = min([dates1.max(),dates2.max()])
+    
     return mindt, maxdt
 
 
@@ -56,27 +73,7 @@ def get_indrange(vals,minval,maxval):
     
 
 def find_nearest(array, val, min=False):
-    """
-    Returs index for value in array that is closest to val.
-
-    Args:
-
-    * array:
-        np.ndarray containing data
-
-    * val:
-        Value to search for in array.
-
-    Kwargs:
-
-    * min - boolean:
-        If True and multiple values are equally close,
-        return minimum value (def=False).
-
-    Returns:
-        Index for array.
-
-    """
+    """ Returns index for value in array that is closest to val. """
     if not isinstance(array, np.ndarray):
         raise TypeError('Array must be a np.ndarray object')
 

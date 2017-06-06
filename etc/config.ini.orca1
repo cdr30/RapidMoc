@@ -60,15 +60,15 @@ streamfunctions=/var/tmp/necr/dat/obs/rapid/volume/2017-06-02/moc_vertical_20040
 time_avg=monthly
 
 [options]
-name=gp69
-plot=True
-outdir=/home/rd/necr/tmp/rapidmoc/ 
 georef_level = 4750
 ekman_depth = 50
-# Set longitude boundaries for each component
-fs_minlon = -81.0
-# fs_maxlon -> ORCA025 = -78.4, ORCA1 = -76.0
-fs_maxlon = -76.0
-# wbw_maxlon -> ORCA025 = -76.1, ORCA1 = -73.0
+fc_minlon = -81.0
+fc_maxlon = -76.0
 wbw_maxlon = -73.0
 int_maxlon = -10.
+
+[output]
+date_format=%Y
+name=gp69
+plot=True
+outdir=/home/rd/necr/tmp/rapidmoc/

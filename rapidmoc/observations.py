@@ -61,7 +61,7 @@ class TransportObs(object):
             ind = (self.yy == yr)
             if ind.any():
                 if profile:
-                    ym_data.append(np.mean(data[:,ind],axis=1))
+                    ym_data.append(np.mean(data[ind,:],axis=0))
                 else:
                     ym_data.append(np.mean(data[ind]))
                     
@@ -76,7 +76,7 @@ class TransportObs(object):
                 ind = (self.yy == yr) & (self.mm == mon)
                 if ind.any():
                     if profile:
-                        mm_data.append(np.mean(data[:,ind],axis=1))
+                        mm_data.append(np.mean(data[ind,:],axis=0))
                     else:
                         mm_data.append(np.mean(data[ind]))
         
@@ -118,14 +118,14 @@ class StreamFunctionObs(TransportObs):
         
         if self.time_avg is None:
             self.dates = self.original_dates
-            self.streamfunction = self._readnc('stream_function_mar').transpose()
+            self.sf = self._readnc('stream_function_mar').transpose()
         elif self.time_avg == 'monthly':
             self.dates = self._mm_dates()
-            self.streamfunction = self._calc_mm(self._readnc('stream_function_mar'),
+            self.sf = self._calc_mm(self._readnc('stream_function_mar').transpose(),
                                      profile=True)
         elif self.time_avg == 'yearly':
             self.dates = self._ym_dates()
-            self.streamfunction = self._calc_ym(self._readnc('stream_function_mar'),
+            self.sf = self._calc_ym(self._readnc('stream_function_mar').transpose(),
                                      profile=True)
         else:
             print self.time_avg
@@ -140,6 +140,7 @@ class StreamFunctionObs(TransportObs):
         self.dd = np.array([dt.day for dt in self.original_dates], dtype=np.int)
         self.mm = np.array([dt.month for dt in self.original_dates], dtype=np.int)
         self.yy = np.array([dt.year for dt in self.original_dates], dtype=np.int)
+
 
 class VolumeTransportObs(TransportObs):
     """ 
@@ -170,19 +171,19 @@ class VolumeTransportObs(TransportObs):
             self.dates = self.original_dates
             self.ekman = self._readnc('t_ek10')
             self.umo = self._readnc('t_umo10')
-            self.fs = self._readnc('t_gs10')
+            self.fc = self._readnc('t_gs10')
             self.moc = self._readnc('moc_mar_hc10')           
         elif self.time_avg == 'monthly':
             self.dates = self._mm_dates()
             self.ekman = self._calc_mm(self._readnc('t_ek10'))
             self.umo = self._calc_mm(self._readnc('t_umo10'))
-            self.fs = self._calc_mm(self._readnc('t_gs10'))
+            self.fc = self._calc_mm(self._readnc('t_gs10'))
             self.moc = self._calc_mm(self._readnc('moc_mar_hc10'))
         elif self.time_avg == 'yearly':
             self.dates = self._ym_dates()
             self.ekman = self._calc_ym(self._readnc('t_ek10'))
             self.umo = self._calc_ym(self._readnc('t_umo10'))
-            self.fs = self._calc_ym(self._readnc('t_gs10'))
+            self.fc = self._calc_ym(self._readnc('t_gs10'))
             self.moc = self._calc_ym(self._readnc('moc_mar_hc10'))
         else:
             print self.time_avg
@@ -218,40 +219,50 @@ class HeatTransportObs(TransportObs):
         
         """
         self._read_dates()
-        
+        self.z = self._readnc('z')
+                
         if self.time_avg is None:
             self.dates = self.original_dates
-            self.q_eddy = self._readnc('Q_eddy')
-            self.q_ek = self._readnc('Q_ek')
-            self.q_fc = self._readnc('Q_fc')
-            self.q_gyre = self._readnc('Q_gyre')
-            self.q_int = self._readnc('Q_int')
-            self.q_mo = self._readnc('Q_mo')
-            self.q_ot = self._readnc('Q_ot')
-            self.q_sum = self._readnc('Q_sum')
-            self.q_wedge = self._readnc('Q_wedge')
+            self.q_eddy = self._readnc('Q_eddy') / 1e15
+            self.q_ek = self._readnc('Q_ek') / 1e15
+            self.q_fc = self._readnc('Q_fc') / 1e15
+            self.q_gyre = self._readnc('Q_gyre') / 1e15
+            self.q_geoint = self._readnc('Q_int') / 1e15
+            self.q_mo = self._readnc('Q_mo') / 1e15
+            self.q_ot = self._readnc('Q_ot') / 1e15
+            self.q_sum = self._readnc('Q_sum') / 1e15
+            self.q_wbw = self._readnc('Q_wedge') / 1e15
+            self.t_basin = self._readnc('T_basin')
+            self.v_basin = self._readnc('V_basin')
+            self.v_fc = self._readnc('V_fc')
         elif self.time_avg == 'monthly':
             self.dates = self._mm_dates()
-            self.q_eddy = self._calc_mm(self._readnc('Q_eddy'))
-            self.q_ek = self._calc_mm(self._readnc('Q_ek'))
-            self.q_fc = self._calc_mm(self._readnc('Q_fc'))
-            self.q_gyre = self._calc_mm(self._readnc('Q_gyre'))
-            self.q_int = self._calc_mm(self._readnc('Q_int'))
-            self.q_mo = self._calc_mm(self._readnc('Q_mo'))
-            self.q_ot = self._calc_mm(self._readnc('Q_ot'))
-            self.q_sum = self._calc_mm(self._readnc('Q_sum'))
-            self.q_wedge = self._calc_mm(self._readnc('Q_wedge'))
+            self.q_eddy = self._calc_mm(self._readnc('Q_eddy')) / 1e15
+            self.q_ek = self._calc_mm(self._readnc('Q_ek')) / 1e15
+            self.q_fc = self._calc_mm(self._readnc('Q_fc')) / 1e15
+            self.q_gyre = self._calc_mm(self._readnc('Q_gyre')) / 1e15
+            self.q_geoint = self._calc_mm(self._readnc('Q_int')) / 1e15
+            self.q_mo = self._calc_mm(self._readnc('Q_mo')) / 1e15
+            self.q_ot = self._calc_mm(self._readnc('Q_ot')) / 1e15
+            self.q_sum = self._calc_mm(self._readnc('Q_sum')) / 1e15
+            self.q_wbw = self._calc_mm(self._readnc('Q_wedge')) / 1e15
+            self.t_basin = self._calc_mm(self._readnc('T_basin'), profile=True)
+            self.v_basin = self._calc_mm(self._readnc('V_basin'), profile=True)
+            self.v_fc = self._calc_mm(self._readnc('V_basin'), profile=True)   
         elif self.time_avg == 'yearly':
             self.dates = self._ym_dates()
-            self.q_eddy = self._calc_ym(self._readnc('Q_eddy'))
-            self.q_ek = self._calc_ym(self._readnc('Q_ek'))
-            self.q_fc = self._calc_ym(self._readnc('Q_fc'))
-            self.q_gyre = self._calc_ym(self._readnc('Q_gyre'))
-            self.q_int = self._calc_ym(self._readnc('Q_int'))
-            self.q_mo = self._calc_ym(self._readnc('Q_mo'))
-            self.q_ot = self._calc_ym(self._readnc('Q_ot'))
-            self.q_sum = self._calc_ym(self._readnc('Q_sum'))
-            self.q_wedge = self._calc_ym(self._readnc('Q_wedge'))
+            self.q_eddy = self._calc_ym(self._readnc('Q_eddy')) / 1e15
+            self.q_ek = self._calc_ym(self._readnc('Q_ek')) / 1e15
+            self.q_fc = self._calc_ym(self._readnc('Q_fc')) / 1e15
+            self.q_gyre = self._calc_ym(self._readnc('Q_gyre')) / 1e15
+            self.q_geoint = self._calc_ym(self._readnc('Q_int')) / 1e15
+            self.q_mo = self._calc_ym(self._readnc('Q_mo')) / 1e15
+            self.q_ot = self._calc_ym(self._readnc('Q_ot')) / 1e15
+            self.q_sum = self._calc_ym(self._readnc('Q_sum')) / 1e15
+            self.q_wbw = self._calc_ym(self._readnc('Q_wedge')) / 1e15
+            self.t_basin = self._calc_ym(self._readnc('T_basin'), profile=True)
+            self.v_basin = self._calc_ym(self._readnc('V_basin'), profile=True)
+            self.v_fc = self._calc_ym(self._readnc('V_basin'), profile=True)
         else:
             print self.time_avg
             raise ValueError('time_avg must be "monthly" or "yearly"')

@@ -10,9 +10,9 @@ import copy
 
 import utils    
 import sections
-import plotdiag
 import transports
-
+import observations
+import plotdiag
 
 def get_args():
     """   Get arguments from command line.  """
@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument(
         'sfile', type=str, help='Path for netcdf file(s) containing salinity data.')
     parser.add_argument(
-        'ufile', type=str, help='Path for netcdf file(s) containing zonal wind stress data.')
+        'taufile', type=str, help='Path for netcdf file(s) containing zonal wind stress data.')
     parser.add_argument(
         'vfile', type=str, help='Path for netcdf file(s) containing meridional velocity data.')
     args = parser.parse_args()
@@ -41,6 +41,33 @@ def get_config(args):
     return config
     
 
+def load_observations(config):
+    """ Load observational data sets """
+    if config.has_option('observations', 'time_avg'):
+        time_avg = config.get('observations', 'time_avg')
+    else:
+        time_avg = None
+
+    sf = observations.StreamFunctionObs(
+        config.get('observations', 'streamfunctions'), time_avg=time_avg)
+    vol = observations.VolumeTransportObs(
+        config.get('observations', 'volume_transports'), time_avg=time_avg)
+    oht = observations.HeatTransportObs(
+        config.get('observations', 'heat_transports'), time_avg=time_avg)    
+
+    return sf, vol, oht
+
+
+def call_plotdiag(config, trans):
+    """ Call plotting routines to compare against RAPID observations """ 
+    obs_sf, obs_vol, obs_oht = load_observations(config)        
+    outdir = config.get('output', 'outdir')
+    date_format = config.get('output', 'date_format')
+    name = config.get('output', 'name')
+    plotdiag.plot_diagnostics(trans, obs_sf, obs_vol, obs_oht, name=name,
+                              outdir=outdir, date_format=date_format)
+
+
 def main():
     """ Parse options and run RapidMoc. """
     args = get_args()
@@ -49,7 +76,7 @@ def main():
     # Read data
     t = sections.ZonalSections(args.tfile, config, 'temperature')
     s = sections.ZonalSections(args.sfile, config, 'salinity')
-    tau = sections.ZonalSections(args.ufile, config, 'taux')
+    tau = sections.ZonalSections(args.taufile, config, 'taux')
     v = sections.ZonalSections(args.vfile, config, 'meridional_velocity')
 
     # Interpolate T & S data onto v-grid
@@ -60,27 +87,11 @@ def main():
     trans = transports.calc_transports_from_sections(
         config, v, tau, t_on_v, s_on_v)
     
-    # Plot data
-    
-    # Write data
-
-
-
-
-
-    # Plot diagnostics
-#    if config.getboolean('options','plot'):
-#        plotdiag.plot_diagnostics(config, model_trans, rapid_trans, fs_trans,
-#                              wbw_trans, int_trans, ek_trans)
+    ## Plot diagnostics
+    if config.getboolean('output','plot'):
+        call_plotdiag(config, trans)
         
-    
-    # Write data to netcdf file
-    import pdb; pdb.set_trace()
-    
+    # Write data
+    print 'SAVING: %s' % trans.filepath()
+    trans.close()
 
-    import pdb; pdb.set_trace()
-
-    # Check OHT data
-    # Save/write data
-    # Optional plot data
- 

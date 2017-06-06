@@ -46,7 +46,7 @@ class ZonalSections(object):
     def __init__(self, f, config, section):
         """ Initialize class and read data """
         self.f = f
-        self.name = config.get('options', 'name')
+        self.name = config.get('output', 'name')
         self.section = section.lower()
         self.var = config.get(section, 'var')
         self.xcoord = config.get(section, 'xcoord')

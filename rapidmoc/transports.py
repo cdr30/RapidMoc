@@ -9,8 +9,6 @@ import copy
 
 import output
 
-import plotdiag
-
 # Constants
 G = 9.81          # Gravitational acceleration (m/s2)
 ROT = 7.292116E-5 # Rotation rate of earth (rad/s) 
@@ -44,10 +42,12 @@ class Transports(object):
         self._avg_v = None
         self._v_no_net = None
         self._net_transport = None
-        self._zonal_mean_v = None
+        self._zonal_avg_v = None
+        self._zonal_avg_v_no_net = None
         self._zonal_anom_v = None
+        self._zonal_sum_v_no_net = None
         self._zonal_sum_v = None
-        self._zonal_mean_t = None
+        self._zonal_avg_t = None
         self._zonal_anom_t = None
         self._streamfunction = None
         self._oht_total = None
@@ -106,24 +106,31 @@ class Transports(object):
         return self._net_transport
        
     @property
+    def zonal_avg_v_no_net(self):
+        """ Return zonal mean of v_no_net """
+        if self._zonal_avg_v_no_net is None:
+            self._zonal_avg_v_no_net = self.zonal_avg(self.v_no_net)
+        return self._zonal_avg_v_no_net
+    
+    @property
     def zonal_avg_v(self):
-        """ Return zonal mean velocity profile """
-        if self._zonal_mean_v is None:
-            self._zonal_mean_v = self.zonal_avg(self.v_no_net)
-        return self._zonal_mean_v
-        
+        """ Return zonal mean of v """
+        if self._zonal_avg_v is None:
+            self._zonal_avg_v = self.zonal_avg(self.v)
+        return self._zonal_avg_v
+    
     @property
     def zonal_avg_t(self):
         """ Return zonal mean temperature profile """
-        if self._zonal_mean_t is None:
-            self._zonal_mean_t = self.zonal_avg(self.t)
-        return self._zonal_mean_t
+        if self._zonal_avg_t is None:
+            self._zonal_avg_t = self.zonal_avg(self.t)
+        return self._zonal_avg_t
     
     @property
     def zonal_anom_v(self):
         """ Return velocity anomalies relative to zonal mean profile """
         if self._zonal_anom_v is None:
-            self._zonal_anom_v = self.v_no_net - self.zonal_avg_v[:,:,np.newaxis]
+            self._zonal_anom_v = self.v_no_net - self.zonal_avg_v_no_net[:,:,np.newaxis]
         return self._zonal_anom_v
         
     @property
@@ -132,13 +139,20 @@ class Transports(object):
         if self._zonal_anom_t is None:
             self._zonal_anom_t = self.t - self.zonal_avg_t[:,:,np.newaxis]
         return self._zonal_anom_t
-
+    
     @property
     def zonal_sum_v(self):
-        """ Return zonally integrated velocity profile """
+        """ Return zonal integral of v """
         if self._zonal_sum_v is None:
-            self._zonal_sum_v = self.zonal_avg(self.v_no_net, total=True)
+            self._zonal_sum_v = self.zonal_avg(self.v, total=True)
         return self._zonal_sum_v
+              
+    @property
+    def zonal_sum_v_no_net(self):
+        """ Return zonal integral of v_no_net """
+        if self._zonal_sum_v_no_net is None:
+            self._zonal_sum_v_no_net = self.zonal_avg(self.v_no_net, total=True)
+        return self._zonal_sum_v_no_net
                 
     @property
     def oht_by_net(self):
@@ -166,7 +180,7 @@ class Transports(object):
     def oht_by_overturning(self):
         """ Return heat transport by local overturning circulation """
         if self._oht_by_overturning is None:
-            self._oht_by_overturning = (self.zonal_sum_v * self.zonal_avg_t *
+            self._oht_by_overturning = (self.zonal_sum_v_no_net * self.zonal_avg_t *
                                         self.dz[np.newaxis,:]).sum(axis=1) * self.rhocp
         return self._oht_by_overturning   
 
@@ -178,14 +192,14 @@ def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
     
     """ 
     # Extract sub-section boundaries
-    fs_minlon = config.getfloat('options','fs_minlon')   # Minimum longitude for Florida Strait
-    fs_maxlon = config.getfloat('options','fs_maxlon')   # Longitude of Florida Strait/WBW boundary
+    fc_minlon = config.getfloat('options','fc_minlon')   # Minimum longitude for Florida current
+    fc_maxlon = config.getfloat('options','fc_maxlon')   # Longitude of Florida current/WBW boundary
     wbw_maxlon = config.getfloat('options','wbw_maxlon') # Longitude of WBW/gyre boundary
     int_maxlon = config.getfloat('options','int_maxlon') # Maximum longitude of gyre interior
     
     # Get indices for sub-sections 
-    fsmin, fsmax = utils.get_indrange(v.x, fs_minlon, fs_maxlon)     # Florida Strait
-    wbwmin, wbwmax = utils.get_indrange(v.x, fs_maxlon, wbw_maxlon)  # WBW
+    fcmin, fcmax = utils.get_indrange(v.x, fc_minlon, fc_maxlon)     # Florida current
+    wbwmin, wbwmax = utils.get_indrange(v.x, fc_maxlon, wbw_maxlon)  # WBW
     intmin, intmax = utils.get_indrange(v.x, wbw_maxlon, int_maxlon) # Gyre interior
     
     # Calculate dynamic heights
@@ -204,32 +218,27 @@ def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
     ek_level = config.getfloat('options','ekman_depth')
     ek = calc_ek(v, tau, wbw_maxlon, int_maxlon, ek_level)
 
-    # Use model velocities in FS and WBW regions
-    vgeo = merge_vgeo_and_v(vgeo, v, fs_minlon, wbw_maxlon)
+    # Use model velocities in fc and WBW regions
+    vgeo = merge_vgeo_and_v(vgeo, v, fc_minlon, wbw_maxlon)
 
     # Apply mass-balance constraints to section
-    vgeo = rapid_mass_balance(vgeo, ek, fs_minlon, wbw_maxlon, int_maxlon)
+    vgeo = rapid_mass_balance(vgeo, ek, fc_minlon, wbw_maxlon, int_maxlon)
 
     # Add ekman to geostrophic transports for combined rapid velocities
     vrapid = copy.deepcopy(vgeo)
     vrapid.data = vgeo.data + ek.data
     
     # Get volume and heat transports on each (sub-)section
-    fs_trans = Transports(vgeo, t_on_v, fsmin, fsmax)        # Florida strait transports
+    fc_trans = Transports(vgeo, t_on_v, fcmin, fcmax)        # Florida current transports
     wbw_trans = Transports(vgeo, t_on_v, wbwmin, wbwmax)     # Western-boundary wedge transports
     int_trans = Transports(vgeo, t_on_v, intmin, intmax)     # Gyre interior transports
     ek_trans = Transports(ek, t_on_v, intmin, intmax)        # Ekman transports
-    model_trans = Transports(v, t_on_v, fsmin, intmax)       # Total section transports using model velocities
-    rapid_trans = Transports(vrapid, t_on_v, fsmin, intmax)  # Total section transports using RAPID approximation
+    model_trans = Transports(v, t_on_v, fcmin, intmax)       # Total section transports using model velocities
+    rapid_trans = Transports(vrapid, t_on_v, fcmin, intmax)  # Total section transports using RAPID approximation
 
-    plotdiag.plot_diagnostics(config, model_trans, rapid_trans, fs_trans,
-                                wbw_trans, int_trans, ek_trans)
-    
-    import pdb; pdb.set_trace()
-    # Create netcdf object holding all transport data for plotting and output
-    
-    trans = output.create_netcdf(rapid_trans, model_trans, fs_trans, 
-                                      wbw_trans, int_trans, ek_trans)
+    # Create netcdf object for output/plotting
+    trans = output.create_netcdf(config,rapid_trans, model_trans, fc_trans, 
+                                 wbw_trans, int_trans, ek_trans)
     
     return trans
     
@@ -365,10 +374,10 @@ def rapid_mass_balance(vgeo, ek, minlon, midlon, maxlon):
     """
     
     # Calculate net transports
-    fswbw_tot = section_integral(vgeo, minlon, midlon)
+    fcwbw_tot = section_integral(vgeo, minlon, midlon)
     ek_tot = section_integral(ek, midlon, maxlon)
     int_tot = section_integral(vgeo, midlon, maxlon)
-    net = int_tot + ek_tot + fswbw_tot
+    net = int_tot + ek_tot + fcwbw_tot
 
     # Get cell dimensions in gyre interior
     minind,maxind = utils.get_indrange(vgeo.x, midlon, maxlon) 
