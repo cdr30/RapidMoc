@@ -3,7 +3,7 @@ This package calculates diagnostics of the Atlantic meridional overturning circu
 
 ## Methods and motivation
 
-Since April 2004, the RAPID-MOCHA array at 26N has made continuous observations of the strength and vertical structure of basin-wide volume and heat transports ([Cunningham et al., 2007](http://science.sciencemag.org/content/317/5840/935); [Johns et al., 2011](http://journals.ametsoc.org/doi/abs/10.1175/2010JCLI3997.1)).  To do this, the array combines sub-marine cable measurements of the Florida current, Ekman transports calculated from zonal wind stress, western boundary wedge (WBW) transports measured using current meters, geostrophic transports measured with dynamic height moorings in the ocean interior, and a mass compensation term to ensure that there is zero net transport through the section ([McCarthy et al., 2015](http://www.sciencedirect.com/science/article/pii/S0079661114001694)).
+Since April 2004, the RAPID-MOCHA array at 26N has made continuous observations of the strength and vertical structure of volume and heat transports in the North Atlantic ([Cunningham et al., 2007](http://science.sciencemag.org/content/317/5840/935); [Johns et al., 2011](http://journals.ametsoc.org/doi/abs/10.1175/2010JCLI3997.1)).  To do this, the array combines sub-marine cable measurements of the Florida current, Ekman transports calculated from zonal wind stress, western boundary wedge (WBW) transports measured using current meters, geostrophic transports measured with dynamic height moorings in the ocean interior, and a mass compensation term to ensure that there is zero net transport through the section ([McCarthy et al., 2015](http://www.sciencedirect.com/science/article/pii/S0079661114001694)).
 
 In order to provide the most appropriate comparisons, RapidMoc calculates model transports using an analagous 'RAPID-style' methodology which can be summarized as follows:
 
@@ -92,6 +92,18 @@ trans = Dataset('model_meridional_transports_at_26N.nc')
 rapidplot.plot_diagnostics(trans, sf, vol, oht, outdir='./',name='plotting_example')
 
 ```
+#### Example plots
+![basinwide_transport_profile.png](example_plots/basinwide_transport_profile.png)
+![florida_current_transport_profile.png](example_plots/florida_current_transport_profile.png)
+![heat_transports_geometric_decomposition.png](example_plots/heat_transports_geometric_decomposition.png)
+![heat_transports_rapid_decomposition.png](example_plots/heat_transports_rapid_decomposition.png)
+![moc_vs_heat_transports.png](example_plots/moc_vs_heat_transports.png)
+![overturning_streamfunction_at_26n_hovmoller.png](example_plots/overturning_streamfunction_at_26n_hovmoller.png)
+![overturning_streamfunctions_at_26n.png](example_plots/overturning_streamfunctions_at_26n.png)
+![volume_transport_components_at_26n.png](example_plots/volume_transport_components_at_26n.png)
+![volume_vs_heat_transports_at_26n.png](example_plots/volume_vs_heat_transports_at_26n.png)
+![zonal_mean_temperature_at_26n.png](example_plots/zonal_mean_temperature_at_26n.png)
+
 
 ## Configuration files
 In order to run RapidMoc, it is necessary to provide a `config.ini` that describes the ocean model data format and specifies options for the RapidMoc calculation. Several example `config.ini` files are provided within the  `etc/` directory. A description of the contents of the `config.ini` file is provided below.

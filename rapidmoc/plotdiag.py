@@ -42,7 +42,7 @@ def plot_streamfunctions(trans, obs_sf, name='simulated', basename=''):
     # Create labels
     obs_label = ('RAPID observations (max=%4.1f Sv, depth=%6i m)' %
                  (sfmax_obs, zmax_obs))
-    model_label = ('%s (max=%4.1f Sv, depth=%6i m)' %
+    model_label = ('%s (model velocities) (max=%4.1f Sv, depth=%6i m)' %
                  (name, sfmax_model, zmax_model))
     rapid_label = ('%s (RAPID approx) (max=%4.1f Sv, depth=%6i m)' %
                  (name, sfmax_rapid, zmax_rapid))
@@ -106,7 +106,7 @@ def plot_streamfunction_hovmollers(trans, obs_sf, name='simulated', basename='')
     plt.pcolormesh(dts, -z, sf_model.transpose(), 
                    vmin=cmin,vmax=cmax,cmap=cmap, norm=norm)
     plt.colorbar(orientation='vertical')
-    plt.title('Overturning streamfunction at 26N in %s' % name)
+    plt.title('Overturning streamfunction at 26N in %s (model velocities)' % name)
     plt.xlabel('Dates')
     plt.ylabel('Depth (m)')
     
@@ -215,7 +215,7 @@ def plot_transport_profile(trans, obs_oht, name='simulated', basename=''):
     plt.plot(v_basin_obs, -z_obs_scaled, '-k', linewidth=4, 
              label='RAPID observations')
     plt.plot(v_basin_model, -z_scaled, color=c1, linewidth=4, 
-             label=name)
+             label='%s (model velocities)' %name)
     plt.plot(v_basin_rapid, -z_scaled, color=c2, linewidth=4, 
              label='%s (RAPID approx)' %name)
 
@@ -378,7 +378,7 @@ def plot_moc_vs_oht(trans, obs_vol, obs_oht, basename='', name='simulated'):
     
     plt.xlabel('MOC (Sv)')
     plt.ylabel('Heat transport (PW)')
-    plt.title('MOC vs OHT in %s' % name)
+    plt.title('MOC vs OHT in %s (model velocities)' % name)
     plt.legend(loc='best', fontsize=8, )
 
     # Save plot
@@ -483,13 +483,13 @@ def plot_geometric_heat_components(trans, obs_oht, basename='', name='simulated'
     q_net_model = trans.variables['q_net_model'][:]
 
     # Create labels
-    q_sum_rapid_label = 'Total (RAPID approx) (%4.2f PW)' % (q_sum_rapid.mean())
-    q_gyre_rapid_label = 'Gyre (RAPID approx) (%4.2f PW)' % (q_gyre_rapid.mean())
-    q_ot_rapid_label = 'Overturning (RAPID approx) (%4.2f PW)' % (q_ot_rapid.mean())
-    q_net_rapid_label = 'Net (RAPID approx) (%4.2f PW)' % (q_net_rapid.mean())
-    q_sum_model_label = 'Total (%4.2f PW)' % (q_sum_model.mean())
+    q_sum_rapid_label = 'Total (%4.2f PW)' % (q_sum_rapid.mean())
+    q_gyre_rapid_label = 'Gyre (%4.2f PW)' % (q_gyre_rapid.mean())
+    q_ot_rapid_label = 'Overturning (%4.2f PW)' % (q_ot_rapid.mean())
+    q_net_rapid_label = 'Net (%4.2f PW)' % (q_net_rapid.mean())
+    q_sum_model_label = 'Total  (%4.2f PW)' % (q_sum_model.mean())
     q_gyre_model_label = 'Gyre (%4.2f PW)' % (q_gyre_model.mean())
-    q_ot_model_label = 'Overturning (%4.2f PW)' % (q_ot_model.mean())
+    q_ot_model_label = 'Overturning  (%4.2f PW)' % (q_ot_model.mean())
     q_net_model_label = 'Net (%4.2f PW)' % (q_net_model.mean())
     q_sum_obs_label = 'Total (%4.2f PW)' % (obs_oht.q_sum.mean())
     q_gyre_obs_label = 'Gyre (%4.2f PW)' % (obs_oht.q_gyre.mean())
