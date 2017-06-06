@@ -75,7 +75,7 @@ In order to use the plotting functionality of RapidMoc, the following observatio
 * `moc_vertical_*.nc` and `moc_transports_*.nc` - netcdf files containing volume transports and overturning stream functions available from the [RAPID project web site](http://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php).
 
 ## Plotting API
-The plotting API can be accessed without having to re-run the RapidMoc calculation. This interface is designed to be used when it necessary to run RapidMoc on multiple "chunks" of data before combining the output into a single netcdf file to create the plots.
+The plotting API can be accessed without having to re-run the RapidMoc calculation.  This interface is designed to be used when it necessary to run RapidMoc on multiple "chunks" of data before combining the output into a single netcdf file to create the plots.
 
 
 ```
@@ -92,18 +92,8 @@ trans = Dataset('model_meridional_transports_at_26N.nc')
 rapidplot.plot_diagnostics(trans, sf, vol, oht, outdir='./',name='plotting_example')
 
 ```
-#### Example plots
-![basinwide_transport_profile.png](example_plots/basinwide_transport_profile.png)
-![florida_current_transport_profile.png](example_plots/florida_current_transport_profile.png)
-![heat_transports_geometric_decomposition.png](example_plots/heat_transports_geometric_decomposition.png)
-![heat_transports_rapid_decomposition.png](example_plots/heat_transports_rapid_decomposition.png)
-![moc_vs_heat_transports.png](example_plots/moc_vs_heat_transports.png)
-![overturning_streamfunction_at_26n_hovmoller.png](example_plots/overturning_streamfunction_at_26n_hovmoller.png)
-![overturning_streamfunctions_at_26n.png](example_plots/overturning_streamfunctions_at_26n.png)
-![volume_transport_components_at_26n.png](example_plots/volume_transport_components_at_26n.png)
-![volume_vs_heat_transports_at_26n.png](example_plots/volume_vs_heat_transports_at_26n.png)
-![zonal_mean_temperature_at_26n.png](example_plots/zonal_mean_temperature_at_26n.png)
 
+Example plots are included at the end of this document.
 
 ## Configuration files
 In order to run RapidMoc, it is necessary to provide a `config.ini` that describes the ocean model data format and specifies options for the RapidMoc calculation. Several example `config.ini` files are provided within the  `etc/` directory. A description of the contents of the `config.ini` file is provided below.
@@ -145,3 +135,15 @@ outdir = path to output directory where data/plots are saved [string]
 ```
 
 Note that it is possible to specify a range of indices in the y-direction. If `j1 != j2`, then data is extracted over a range of j-indices and then averaged to create a single zonal section. This allows data to be specified in a way that respects the staggering of the original model grid. 
+
+## Example plots
+![basinwide_transport_profile.png](example_plots/basinwide_transport_profile.png)
+![florida_current_transport_profile.png](example_plots/florida_current_transport_profile.png)
+![heat_transports_geometric_decomposition.png](example_plots/heat_transports_geometric_decomposition.png)
+![heat_transports_rapid_decomposition.png](example_plots/heat_transports_rapid_decomposition.png)
+![moc_vs_heat_transports.png](example_plots/moc_vs_heat_transports.png)
+![overturning_streamfunction_at_26n_hovmoller.png](example_plots/overturning_streamfunction_at_26n_hovmoller.png)
+![overturning_streamfunctions_at_26n.png](example_plots/overturning_streamfunctions_at_26n.png)
+![volume_transport_components_at_26n.png](example_plots/volume_transport_components_at_26n.png)
+![volume_vs_heat_transports_at_26n.png](example_plots/volume_vs_heat_transports_at_26n.png)
+![zonal_mean_temperature_at_26n.png](example_plots/zonal_mean_temperature_at_26n.png)
