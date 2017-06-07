@@ -218,7 +218,12 @@ def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
    
     # Calculate Ekman velocities
     ek_level = config.getfloat('options','ekman_depth')
-    ek = calc_ek(v, tau, wbw_maxlon, int_maxlon, ek_level)
+    if config.has_option('options','ek_profile_type'):
+        ek_profile = config.get('options','ek_profile_type')
+    else:
+        ek_profile = 'uniform'
+
+    ek = calc_ek(v, tau, wbw_maxlon, int_maxlon, ek_level, profile=ek_profile)
 
     # Use model velocities in fc and WBW regions
     vgeo = merge_vgeo_and_v(vgeo, v, fc_minlon, wbw_maxlon)
@@ -322,7 +327,7 @@ def update_georef(vgeo, v, vref_level):
     return vgeo
 
 
-def calc_ek(v, tau, minlon, maxlon, ek_level):
+def calc_ek(v, tau, minlon, maxlon, ek_level, profile='uniform'):
     """ Return ZonalSections containing Ekman velocities """
 
     # Copy velocity data structure
@@ -339,15 +344,47 @@ def calc_ek(v, tau, minlon, maxlon, ek_level):
     corf = 2 * ROT * np.sin(np.pi * (lats / 180.) ) 
     ek_trans = ((-1. *  taux / (corf * RHO_REF)) * dx ).sum(axis=1)
 
-    # Calculate average velocity over ekman layer
+    # Calculate velocities over ekman layer 
     ek_minind, ek_maxind = utils.get_indrange(v.z, 0, ek_level)
     dz = v.dz_as_data[0,ek_minind:ek_maxind,intmin:intmax]
     dx = v.cell_widths_as_data[0,ek_minind:ek_maxind,intmin:intmax]
-    ek_area = (dx * dz).sum()
-    ek.data[:,ek_minind:ek_maxind,intmin:intmax] = ek_trans[:,np.newaxis, np.newaxis] / ek_area
-    ek.data = np.ma.MaskedArray(ek.data, mask=v.mask)
 
-    return ek    
+    if profile == 'uniform':
+        # Use uniform Ekman velocities
+        ek_area = (dx * dz).sum()
+        ek.data[:,ek_minind:ek_maxind,intmin:intmax] = ek_trans[:,np.newaxis, np.newaxis] / ek_area
+        ek.data = np.ma.MaskedArray(ek.data, mask=v.mask)
+    elif profile == 'linear':
+        # Use Ekman transport profile that linearly reduces to zero at z=zek
+        zprof = ek.z[ek_minind:ek_maxind]
+        dzprof = ek.dz[ek_minind:ek_maxind]
+        zmax = dzprof.sum()
+        vek = get_linear_profiles(ek_trans, zprof, dzprof, zmax) / dx[np.newaxis].sum(axis=2)
+        ek.data[:,ek_minind:ek_maxind,intmin:intmax] = vek[:,:,np.newaxis]
+    else:
+        raise ValueError('Unrecognized ekman profile type')
+
+    return ek
+
+
+
+def get_linear_profiles(u_int, z, dz, zmax):
+    """
+    Return transport profile U_z that decreases linearly from z=0 to
+    z=zmax and is constrained by u_int.
+
+    u(z) = umax when z=0
+    u(z) = 0 when z=zmax
+
+    \int_{z=zmax}^{z=0} u(z) dz = u_int
+    
+    """
+    
+    u_max = 2 * u_int / zmax**2
+    u_z = u_max[:,np.newaxis] * (zmax - z)[np.newaxis,:] 
+    scale = u_int / (u_z * dz[np.newaxis]).sum(axis=1) # Ensure conservation of integral
+
+    return u_z * scale[:,np.newaxis]
 
 
 def merge_vgeo_and_v(vgeo, v, minlon, maxlon):
