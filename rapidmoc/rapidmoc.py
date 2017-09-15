@@ -29,6 +29,8 @@ def get_args():
         'taufile', type=str, help='Path for netcdf file(s) containing zonal wind stress data.')
     parser.add_argument(
         'vfile', type=str, help='Path for netcdf file(s) containing meridional velocity data.')
+    parser.add_argument(
+        '--name', type=str, help='Name used in output files.', default='RapidMoc')
     args = parser.parse_args()
 
     return args
@@ -74,6 +76,9 @@ def main():
     args = get_args()
     config = get_config(args)
 
+    # Update name in config file
+    config.set('output', 'name', args.name)
+    
     # Read data
     t = sections.ZonalSections(args.tfile, config, 'temperature')
     s = sections.ZonalSections(args.sfile, config, 'salinity')
