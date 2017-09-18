@@ -36,39 +36,55 @@ def get_args():
     return args
 
  
+
 def get_config(args):
     """ Return configuration options as <ConfigParser> object. """
     config = ConfigParser.ConfigParser()
     config.read(args.config_file)
 
     return config
-    
 
-def load_observations(config):
-    """ Load observational data sets """
-    if config.has_option('observations', 'time_avg'):
-        time_avg = config.get('observations', 'time_avg')
+
+def get_config_opt(config, section, option):
+    """ Return option if exists, else None """
+    if config.has_option(section, option):
+        return config.get(section, option)
     else:
-        time_avg = None
-
-    sf = observations.StreamFunctionObs(
-        config.get('observations', 'streamfunctions'), time_avg=time_avg)
-    vol = observations.VolumeTransportObs(
-        config.get('observations', 'volume_transports'), time_avg=time_avg)
-    oht = observations.HeatTransportObs(
-        config.get('observations', 'heat_transports'), time_avg=time_avg)    
-
-    return sf, vol, oht
+        return None
 
 
 def call_plotdiag(config, trans):
     """ Call plotting routines to compare against RAPID observations """ 
-    obs_sf, obs_vol, obs_oht = load_observations(config)        
+
+    # Initialize observations
+    obs_fc, obs_oht, obs_vol, obs_sf = None, None, None, None
+
+    # Get observation file paths
+    time_avg = get_config_opt(config, 'observations', 'time_avg')
+    obs_sf_f = get_config_opt(config, 'observations', 'streamfunctions')
+    obs_fc_f = get_config_opt(config, 'observations', 'florida_current')
+    obs_vol_f = get_config_opt(config, 'observations', 'volume_transports')
+    obs_oht_f = get_config_opt(config, 'observations', 'heat_transports')
+    
+    # Load observations, if specified
+    if obs_oht_f is not None:
+        obs_oht = observations.HeatTransportObs(obs_oht_f, time_avg=time_avg)
+
+    if obs_fc_f is not None:
+        obs_fc = observations.FloridaCurrentObs(obs_fc_f, time_avg=time_avg)
+
+    if obs_sf_f is not None:
+        obs_sf = observations.StreamFunctionObs(obs_sf_f, time_avg=time_avg)
+
+    if obs_vol_f is not None:
+        obs_vol = observations.VolumeTransportObs(obs_vol_f, time_avg=time_avg)
+ 
+    # Call plot routines
     outdir = config.get('output', 'outdir')
     date_format = config.get('output', 'date_format')
     name = config.get('output', 'name')
-    plotdiag.plot_diagnostics(trans, obs_sf, obs_vol, obs_oht, name=name,
-                              outdir=outdir, date_format=date_format)
+    plotdiag.plot_diagnostics(trans, name=name, outdir=outdir, date_format=date_format,
+                              obs_vol=obs_vol, obs_fc=obs_fc, obs_oht=obs_oht, obs_sf=obs_sf)
 
 
 def main():
@@ -78,7 +94,7 @@ def main():
 
     # Update name in config file
     config.set('output', 'name', args.name)
-    
+
     # Read data
     t = sections.ZonalSections(args.tfile, config, 'temperature')
     s = sections.ZonalSections(args.sfile, config, 'salinity')

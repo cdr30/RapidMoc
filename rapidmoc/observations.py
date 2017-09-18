@@ -6,12 +6,11 @@ Module containing code to work with Rapid observational data
 from netCDF4 import Dataset, num2date
 import datetime
 import numpy as np
-import abc
 
 
 class TransportObs(object):
     """ Template class to interface with observed ocean transports """
-    
+
     def __init__(self, f, time_avg=None, mindt=None, maxdt=None):
         """ Create instance holding ocean transport data """
         self.f = f
@@ -20,12 +19,10 @@ class TransportObs(object):
         self.maxdt = maxdt
         self._read_data()
 
-    @abc.abstractmethod
     def _read_data(self):
         """ Abstract method to read data and apply time averaging """
         pass
     
-    @abc.abstractmethod
     def _read_dates(self):
         """ Abstract method to initialized dates """
         pass
@@ -215,7 +212,7 @@ class HeatTransportObs(TransportObs):
     
     def _read_data(self):
         """ 
-        Read data at original frequency or convert to monthly means
+        Read data at original frequency or calculate a time-average
         
         """
         self._read_dates()
@@ -282,3 +279,49 @@ class HeatTransportObs(TransportObs):
         self.original_dates = np.array(dts)
 
                     
+
+class FloridaCurrentObs(TransportObs):
+    """ 
+    Class to hold Florida current transport estimates derived from
+    submarine cable measurements.
+        
+    Data source:
+    http://www.aoml.noaa.gov/phod/floridacurrent/data_access.php
+    
+    The Florida Current cable and section data are made freely available
+    on the Atlantic Oceanographic and Meteorological Laboratory web page 
+    (www.aoml.noaa.gov/phod/floridacurrent/) and are funded by the DOC-NOAA
+    Climate Program Office - Ocean Observing and Monitoring Division.
+
+    The project scientists would also appreciate it if you informed us of 
+    any publications or presentations that you prepare using this data.
+    Continued funding of this project depends on us being able to justify 
+    to NOAA (and hence the US Congress) the usefulness of this data.
+        
+    """
+    
+    def _read_data(self):
+        """ Read data and apply time averaging """
+        self._read_dates()
+        
+        if self.time_avg is None:
+            self.fc = self._readnc('florida_current_transport')
+        elif self.time_avg == 'monthly':
+            self.dates = self._mm_dates()
+            self.fc = self._calc_mm(self._readnc('florida_current_transport'))
+        elif self.time_avg == 'yearly':
+            self.dates = self._ym_dates()
+            self.fc = self._calc_ym(self._readnc('florida_current_transport'))
+        else:
+            print self.time_avg
+            raise ValueError('time_avg must be "monthly" or "yearly"')
+ 
+    def _read_dates(self):
+        """ Read date information from file """
+        nc = Dataset(self.f)
+        t = nc.variables['time']
+        self.original_dates = num2date(t[:],units=t.units)
+        self.hh = np.array([dt.hour for dt in self.original_dates], dtype=np.int)
+        self.dd = np.array([dt.day for dt in self.original_dates], dtype=np.int)
+        self.mm = np.array([dt.month for dt in self.original_dates], dtype=np.int)
+        self.yy = np.array([dt.year for dt in self.original_dates], dtype=np.int)

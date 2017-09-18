@@ -57,6 +57,7 @@ maskmdi = 0
 heat_transports=/var/tmp/necr/dat/obs/rapid/moht/2017-06-02/mocha_mht_data_2014_updated_oct_2015.nc
 volume_transports=/var/tmp/necr/dat/obs/rapid/volume/2017-06-02/moc_transports_200404_20151011.nc
 streamfunctions=/var/tmp/necr/dat/obs/rapid/volume/2017-06-02/moc_vertical_200404_20151011.nc
+florida_current=/var/tmp/necr/dat/obs/florida_straits/FC_cable_transport_1982-2017.nc
 time_avg=monthly
 
 [options]

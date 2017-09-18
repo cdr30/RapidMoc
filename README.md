@@ -84,12 +84,15 @@ from netCDF4 import Dataset
 import rapidmoc.observations as rapidobs
 import rapidmoc.plotdiag as rapidplot
 
-oht = rapidobs.HeatTransportObs('mocha_mht_data.nc', time_avg='monthly')
-vol = rapidobs.VolumeTransportObs('moc_transports.nc', time_avg='monthly')
-sf = rapidobs.StreamFunctionObs('moc_vertical.nc', time_avg='monthly')
+obs_oht = observations.HeatTransportObs(obs_oht_f, time_avg=time_avg)
+obs_fc = observations.FloridaCurrentObs(obs_fc_f, time_avg=time_avg)
+obs_sf = observations.StreamFunctionObs(obs_sf_f, time_avg=time_avg)
+obs_vol = observations.VolumeTransportObs(obs_vol_f, time_avg=time_avg)
 trans = Dataset('model_meridional_transports_at_26N.nc')
 
-rapidplot.plot_diagnostics(trans, sf, vol, oht, outdir='./',name='plotting_example')
+rapidplot.plot_streamfunctions(trans, name='simulated', basename='', 
+				      obs_sf=obs_sf, obs_oht=obs_oht,
+				      obs_vol=obs_vol, obs_fc=obs_fc)
 
 ```
 
@@ -113,10 +116,11 @@ maskf = path to netcdf file containing explicit data mask [string, optional]
 maskvar = netcdf variable name for mask in maskf [string, optional]
 maskmdi = missing data indicator for maskvar [float, optional]
 
-[observations]
-heat_transports = path to mocha mht data.nc [string]
-volume_transports = path to moc transports.nc [string]
-streamfunctions = path to moc vertical.nc [string]
+[observations] 
+heat_transports = path to mocha mht data.nc [string, optional]
+volume_transports = path to moc transports.nc [string, optional]
+streamfunctions = path to moc vertical.nc [string, optional]
+florida_current = path to extended florida current transports.nc [string, optional]
 time_avg = monthly or yearly [string, optional]
 
 [options]
