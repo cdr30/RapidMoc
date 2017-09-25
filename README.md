@@ -21,25 +21,36 @@ In order to provide the most appropriate comparisons, RapidMoc calculates model 
 The impact of uncertainties in the geostrophic level of no motion is described further by [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full).
 
 ## Using RapidMoc
+
+### Install package
+
+To install the package, run:
+
+```bash
+pip install git+https://github.com:cdr30/RapidMoc.git#egg=RapidMoc
+```
+
+### Install manually
+
 #### Required python libraries
-RapidMoc was developed using Python 2.7 and requires the installation of the following python libraries and their associated dependencies: `numpy`, `netCDF4`, `ConfigParser`, `argparse`, `os`, `matplotlib`, `abc`, `datetime`, `scipy`, `copy`, and `math`. 
+RapidMoc was developed using Python 2.7 and requires the installation of the following python libraries and their associated dependencies: `numpy`, `netCDF4`, `ConfigParser`, `argparse`, `os`, `matplotlib`, `abc`, `datetime`, `scipy`, `copy`, and `math`.
 
 
 #### Cloning the git repository
-To retrieve a copy of the RapidMoc source code and create a working directory, run the following on the command line: 
+To retrieve a copy of the RapidMoc source code and create a working directory, run the following on the command line:
 
 ```> git clone git@github.com:cdr30/RapidMoc.git```
 
-or 
+or
 
 ```> git clone https://github.com/cdr30/RapidMoc.git```
 
 
-#### Running RapidMoc
+### Running RapidMoc
 RapidMoc is invoked from the command line using the `run_rapidmoc.py` script. Running with the `-h` option will return a help message on the required arguments.
 
 ```
-> ./run_rapidmoc.py -h 
+> ./run_rapidmoc.py -h
 usage: run_rapidmoc.py [-h] config_file tfile sfile taufile vfile
 
 Calculate RAPID AMOC diagnostics using ocean model data
@@ -57,10 +68,10 @@ optional arguments:
 
 Netcdf files can be specified using a specific path or a glob pattern as show in the example below:
 ```
-run_rapidmoc.py  config.ini "/path/to/tfiles_????.nc" "/path/to/sfiles_????.nc" "/path/to/taufiles_????.nc" "/path/to/vfiles_????.nc" 
+run_rapidmoc.py  config.ini "/path/to/tfiles_????.nc" "/path/to/sfiles_????.nc" "/path/to/taufiles_????.nc" "/path/to/vfiles_????.nc"
 ```
 
-*Important*: glob patterns must be surrounded by quotation marks to prevent the shell from expanding them automatically on the command line. 
+*Important*: glob patterns must be surrounded by quotation marks to prevent the shell from expanding them automatically on the command line.
 
 
 ## Model data
@@ -76,7 +87,7 @@ where the x-coordinate is assumed to be approximately zonal, and the y-coordinat
 ## Observational data
 In order to use the plotting functionality of RapidMoc, the following observational data sets must be downloaded from the RAPID-MOCHA project web-pages:
 
-* `mocha_mht_data_*.nc` - a netcdf file containing heat transport data available from the [MOCHA project web site](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm)  
+* `mocha_mht_data_*.nc` - a netcdf file containing heat transport data available from the [MOCHA project web site](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm)
 
 * `moc_vertical_*.nc` and `moc_transports_*.nc` - netcdf files containing volume transports and overturning stream functions available from the [RAPID project web site](http://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php).
 
@@ -96,7 +107,7 @@ obs_sf = rapidobs.StreamFunctionObs(obs_sf_f, time_avg=time_avg)
 obs_vol = rapidobs.VolumeTransportObs(obs_vol_f, time_avg=time_avg)
 trans = Dataset('model_meridional_transports_at_26N.nc')
 
-rapidplot.plot_streamfunctions(trans, name='simulated', basename='', 
+rapidplot.plot_streamfunctions(trans, name='simulated', basename='',
 				      obs_sf=obs_sf, obs_oht=obs_oht,
 				      obs_vol=obs_vol, obs_fc=obs_fc)
 
@@ -117,12 +128,12 @@ tcoord = netcdf variable name for time in tfile/sfile/taufile/vfile [string]
 i1 = minimum index in x coordinate used to extract zonal section from tfile/sfile/taufile/vfile [integer]
 i2 = maximum index in x coordinate used to extract zonal section from tfile/sfile/taufile/vfile [integer]
 j1 = minimum index in y coordinate used to extract zonal section from tfile/sfile/taufile/vfile [integer]
-j2 = maximum index in y coordinate used to extract zonal section from tfile/sfile/taufile/vfile [integer] 
+j2 = maximum index in y coordinate used to extract zonal section from tfile/sfile/taufile/vfile [integer]
 maskf = path to netcdf file containing explicit data mask [string, optional]
 maskvar = netcdf variable name for mask in maskf [string, optional]
 maskmdi = missing data indicator for maskvar [float, optional]
 
-[observations] 
+[observations]
 heat_transports = path to mocha mht data.nc [string, optional]
 volume_transports = path to moc transports.nc [string, optional]
 streamfunctions = path to moc vertical.nc [string, optional]
@@ -141,11 +152,11 @@ int_maxlon = longitude corresponding to eastern boundary of geostrophic interior
 [output]
 date_format = format string used with datetime.strftime, e.g. '%Y%m%d' [string]
 name = descriptive string used to describe model experiment [string]
-plot = boolean used to enable/disable plotting [boolean] 
+plot = boolean used to enable/disable plotting [boolean]
 outdir = path to output directory where data/plots are saved [string]
 ```
 
-Note that it is possible to specify a range of indices in the y-direction. If `j1 != j2`, then data is extracted over a range of j-indices and then averaged to create a single zonal section. This allows data to be specified in a way that respects the staggering of the original model grid. 
+Note that it is possible to specify a range of indices in the y-direction. If `j1 != j2`, then data is extracted over a range of j-indices and then averaged to create a single zonal section. This allows data to be specified in a way that respects the staggering of the original model grid.
 
 ## Example plots
 ![basinwide_transport_profile.png](example_plots/basinwide_transport_profile.png)
