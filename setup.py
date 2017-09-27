@@ -1,4 +1,4 @@
-"""Setup gnomon."""
+"""Setup RapidMoc."""
 
 from setuptools import setup
 
