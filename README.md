@@ -1,5 +1,11 @@
 # RapidMoc
-This package calculates diagnostics of the Atlantic meridional overturning circulation (AMOC) using output from an ocean general circulation model and plots comparison with observed data from the RAPID-MOCHA array at 26N. Observational data and further details about the RAPID-MOCHA array can be found [here](http://www.rapid.ac.uk/) and [here](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm).
+This package calculates diagnostics of the Atlantic meridional overturning circulation (AMOC) using output from ocean general circulation models (including those with curvilinear grids) and plots comparison with observed data from the RAPID-MOCHA array at 26N. Observational data and further details about the RAPID-MOCHA array can be found [here](http://www.rapid.ac.uk/) and [here](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm).
+
+## How to acknowledge this code
+If you use RapidMoc in analysis for a journal article, please cite [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full), which includes a full description of the methodology.
+
+*Full citation*: Roberts, C. D., et al. (2013), Atmosphere drives recent interannual variability of the Atlantic meridional overturning circulation at 26.5°N, Geophys. Res. Lett., 40, 5164–5170 doi:10.1002/grl.50930.
+
 
 ## Methods and motivation
 
@@ -12,7 +18,7 @@ In order to provide the most appropriate comparisons, RapidMoc calculates model 
 * Interior geostrophic transports are calculated relative to a specified level of no motion.
 * A mass-compensation term is applied as a uniform adjustment to the interior geostrophic velocity field to ensure zero net-flow across the section.
 
-The model-based methodology employed by RapidMoc and the impact of uncertainties in the geostrophic level of no motion is described further by [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full).
+The impact of uncertainties in the geostrophic level of no motion is described further by [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full).
 
 ## Using RapidMoc
 #### Required python libraries
