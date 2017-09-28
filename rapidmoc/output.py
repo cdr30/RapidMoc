@@ -36,7 +36,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     """
     
     # Configuration options
-    zind = utils.find_nearest(rapid_trans.z, 1000)
+    zind = rapid_trans.streamfunction.mean(axis=0).argmax()
     fc_minlon = config.getfloat('options','fc_minlon') 
     fc_maxlon = config.getfloat('options','fc_maxlon')  
     wbw_maxlon = config.getfloat('options','wbw_maxlon')

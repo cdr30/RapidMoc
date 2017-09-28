@@ -23,7 +23,7 @@ c3='#b2df8a'
 c4='#33a02c'
 
 
-def plot_streamfunctions(trans, name='simulated', basename='', obs=None):
+def plot_streamfunctions(trans, name='simulated', basename='', obs=None,lw=4):
     """ Plot time mean overturning stream functions"""
 
     # Extract variables from data objects
@@ -43,8 +43,8 @@ def plot_streamfunctions(trans, name='simulated', basename='', obs=None):
 
     # Add data to axis
     fig = plt.figure(figsize=(6,8))
-    plt.plot(sf_model, -z,'-', color=c1, linewidth=4, label=model_label)
-    plt.plot(sf_rapid, -z,'-', linewidth=4, color=c2, label=rapid_label)
+    plt.plot(sf_model, -z,'-', color=c1, linewidth=lw, label=model_label)
+    plt.plot(sf_rapid, -z,'-', linewidth=lw, color=c2, label=rapid_label)
 
     # Plot optional observational data
     if obs is not None:
@@ -54,7 +54,7 @@ def plot_streamfunctions(trans, name='simulated', basename='', obs=None):
         zmax_obs = z_obs[np.argmax(sf_obs)]
         obs_label = ('RAPID observations (max=%4.1f Sv, depth=%6i m)' %
                      (sfmax_obs, zmax_obs))
-        plt.plot(sf_obs, -z_obs, '-k', linewidth=4, label=obs_label)
+        plt.plot(sf_obs, -z_obs, '-k', linewidth=lw, label=obs_label)
         
     # Annotate plot
     plt.title('Atlantic overturning streamfunction at 26N')
@@ -122,7 +122,7 @@ def plot_streamfunction_hovmollers(trans, name='simulated', basename='', obs=Non
     plt.close() 
     
     
-def plot_zonal_mean_temperature(trans, name='simulated', basename='', obs=None):
+def plot_zonal_mean_temperature(trans, name='simulated', basename='', obs=None,lw=4):
     """ Plot basin-wide zonal mean otential temperature profile """
 
     # Extract variables from data objects
@@ -132,14 +132,14 @@ def plot_zonal_mean_temperature(trans, name='simulated', basename='', obs=None):
     
     # Add data to axis
     fig = plt.figure(figsize=(6,8))
-    plt.plot(t_basin, -z_scaled, color=c1, linewidth=4, label=name)
+    plt.plot(t_basin, -z_scaled, color=c1, linewidth=lw, label=name)
 
     # Add optional observed data
     if obs is not None:
         z_obs = obs.z
         z_obs_scaled = np.sqrt(z_obs)
         t_basin_obs = obs.t_basin.mean(axis=0)
-        plt.plot(t_basin_obs, -z_obs_scaled, '-k', linewidth=4, label='RAPID observations')
+        plt.plot(t_basin_obs, -z_obs_scaled, '-k', linewidth=lw, label='RAPID observations')
         
     # Annotate plot
     zticks, zlabels = get_zscale_ticks()
@@ -166,7 +166,7 @@ def get_zscale_ticks():
     return zticks, zlabels
 
 
-def plot_fc_transport_profile(trans, name='simulated', basename='', obs=None):
+def plot_fc_transport_profile(trans, name='simulated', basename='', obs=None,lw=4):
     """ Plot Florida Current transport profile """
 
     # Add model data to axis
@@ -174,14 +174,14 @@ def plot_fc_transport_profile(trans, name='simulated', basename='', obs=None):
     z = trans.variables['depth'][:]
     z_scaled = np.sqrt(z)
     v_fc = trans.variables['v_fc'][:].mean(axis=0)
-    plt.plot(v_fc, -z_scaled, color=c2, linewidth=4, label=name)
+    plt.plot(v_fc, -z_scaled, color=c2, linewidth=lw, label=name)
 
     # add optional obs data to axis
     if obs is not None:
         z_obs = obs.z
         z_obs_scaled = np.sqrt(z_obs)
         v_fc_obs = obs.v_fc.mean(axis=0)
-        plt.plot(v_fc_obs, -z_obs_scaled, '-k', linewidth=4, 
+        plt.plot(v_fc_obs, -z_obs_scaled, '-k', linewidth=lw, 
                  label='RAPID observations')
  
     # Annotate plot
@@ -200,7 +200,7 @@ def plot_fc_transport_profile(trans, name='simulated', basename='', obs=None):
     plt.close()
     
     
-def plot_transport_profile(trans, name='simulated', basename='', obs=None):
+def plot_transport_profile(trans, name='simulated', basename='', obs=None,lw=4):
     """ Plot basin-wide zonal transport profile """
 
     # Add model data to axis
@@ -210,9 +210,9 @@ def plot_transport_profile(trans, name='simulated', basename='', obs=None):
     v_basin_rapid = trans.variables['v_basin_rapid'][:].mean(axis=0)
     v_basin_model = trans.variables['v_basin_model'][:].mean(axis=0)
     
-    plt.plot(v_basin_model, -z_scaled, color=c1, linewidth=4, 
+    plt.plot(v_basin_model, -z_scaled, color=c1, linewidth=lw, 
              label='%s (model velocities)' %name)
-    plt.plot(v_basin_rapid, -z_scaled, color=c2, linewidth=4, 
+    plt.plot(v_basin_rapid, -z_scaled, color=c2, linewidth=lw, 
              label='%s (RAPID approx)' %name)
 
     # Add optional obs data to axis
@@ -220,7 +220,7 @@ def plot_transport_profile(trans, name='simulated', basename='', obs=None):
         z_obs = obs.z
         v_basin_obs = obs.v_basin.mean(axis=0)
         z_obs_scaled = np.sqrt(z_obs)
-        plt.plot(v_basin_obs, -z_obs_scaled, '-k', linewidth=4, 
+        plt.plot(v_basin_obs, -z_obs_scaled, '-k', linewidth=lw, 
                  label='RAPID observations')
    
     # Annotate plot
@@ -239,7 +239,7 @@ def plot_transport_profile(trans, name='simulated', basename='', obs=None):
     plt.close()
     
     
-def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, obs_fc=None):
+def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, obs_fc=None,lw=4):
     """ Plot volume transport component time series """
     
     # Add model data to sub-axis
@@ -250,17 +250,17 @@ def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, o
     fc = trans.variables['fc'][:]
     ekman = trans.variables['ekman'][:]
     umo = trans.variables['umo'][:]
-    moc = trans.variables['moc_rapid'][:]
+    moc = trans.variables['moc_rapid'][:]gg
 
     fc_label = 'Florida current (%6.1f Sv)' % (fc.mean())
     ek_label = 'Ekman transport (%6.1f Sv)' % (ekman.mean())
     umo_label = 'Upper-mid ocean (%4.1f Sv)' % (umo.mean())
     moc_label = 'MOC (%6.1f Sv)' % (moc.mean())
 
-    plt.plot(dts, fc, linewidth=4, color=c1, label=fc_label)
-    plt.plot(dts, ekman, linewidth=4, color=c2, label=ek_label)
-    plt.plot(dts, umo, linewidth=4, color=c3, label=umo_label)
-    plt.plot(dts, moc, linewidth=4, color='k', label=moc_label)
+    plt.plot(dts, fc, linewidth=lw, color=c1, label=fc_label)
+    plt.plot(dts, ekman, linewidth=lw, color=c2, label=ek_label)
+    plt.plot(dts, umo, linewidth=lw, color=c3, label=umo_label)
+    plt.plot(dts, moc, linewidth=lw, color='k', label=moc_label)
 
     plt.xlabel('Date')
     plt.ylim([-50,50])
@@ -279,14 +279,14 @@ def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, o
             umo_obs_label = 'Upper-mid ocean (%4.1f Sv)' % (obs_vol.umo.mean())
             moc_obs_label = 'MOC (%6.1f Sv)' % (obs_vol.moc.mean())
         
-            plt.plot(obs_vol.dates, obs_vol.fc, linewidth=4, color=c1, label=fc_obs_label)
-            plt.plot(obs_vol.dates, obs_vol.ekman, linewidth=4, color=c2, label=ek_obs_label)
-            plt.plot(obs_vol.dates, obs_vol.umo, linewidth=4, color=c3, label=umo_obs_label)
-            plt.plot(obs_vol.dates, obs_vol.moc, linewidth=4, color='k', label=moc_obs_label)
+            plt.plot(obs_vol.dates, obs_vol.fc, linewidth=lw, color=c1, label=fc_obs_label)
+            plt.plot(obs_vol.dates, obs_vol.ekman, linewidth=lw, color=c2, label=ek_obs_label)
+            plt.plot(obs_vol.dates, obs_vol.umo, linewidth=lw, color=c3, label=umo_obs_label)
+            plt.plot(obs_vol.dates, obs_vol.moc, linewidth=lw, color='k', label=moc_obs_label)
 
         if obs_fc is not None:
             fc_obs_ext_label = 'FC - extended (%6.1f Sv)' % (obs_fc.fc.mean())
-            plt.plot(obs_fc.dates, obs_fc.fc, linewidth=4, color=c4, label=fc_obs_ext_label)
+            plt.plot(obs_fc.dates, obs_fc.fc, linewidth=lw, color=c4, label=fc_obs_ext_label)
             
 
         plt.xlabel('Date')
@@ -490,7 +490,7 @@ def plot_vol_vs_heat_transports(trans, basename='', name='simulated', obs_vol=No
     plt.close()
 
     
-def plot_geometric_heat_components(trans, basename='', name='simulated', obs=None):
+def plot_geometric_heat_components(trans, basename='', name='simulated', obs=None,lw=4):
     """ Plot geometric heat transport components """
       
     # Add model data to sub-axis (model v)
@@ -508,10 +508,10 @@ def plot_geometric_heat_components(trans, basename='', name='simulated', obs=Non
     q_ot_model_label = 'Overturning  (%4.2f PW)' % (q_ot_model.mean())
     q_net_model_label = 'Net (%4.2f PW)' % (q_net_model.mean())
     
-    plt.plot(dts, q_sum_model, linewidth=4, color='k', label=q_sum_model_label)
-    plt.plot(dts, q_ot_model, linewidth=4, color=c1, label=q_ot_model_label)
-    plt.plot(dts, q_gyre_model, linewidth=4, color=c2, label=q_gyre_model_label)
-    plt.plot(dts, q_net_model, linewidth=4, color=c3, label=q_net_model_label)
+    plt.plot(dts, q_sum_model, linewidth=lw, color='k', label=q_sum_model_label)
+    plt.plot(dts, q_ot_model, linewidth=lw, color=c1, label=q_ot_model_label)
+    plt.plot(dts, q_gyre_model, linewidth=lw, color=c2, label=q_gyre_model_label)
+    plt.plot(dts, q_net_model, linewidth=lw, color=c3, label=q_net_model_label)
 
     plt.xlabel('Date')
     plt.ylim([-.5,2.5])
@@ -533,10 +533,10 @@ def plot_geometric_heat_components(trans, basename='', name='simulated', obs=Non
     q_ot_rapid_label = 'Overturning (%4.2f PW)' % (q_ot_rapid.mean())
     q_net_rapid_label = 'Net (%4.2f PW)' % (q_net_rapid.mean())
 
-    plt.plot(dts, q_sum_rapid, linewidth=4, color='k', label=q_sum_rapid_label)
-    plt.plot(dts, q_ot_rapid, linewidth=4, color=c1, label=q_ot_rapid_label)
-    plt.plot(dts, q_gyre_rapid, linewidth=4, color=c2, label=q_gyre_rapid_label)
-    plt.plot(dts, q_net_rapid, linewidth=4, color=c3, label=q_net_rapid_label)
+    plt.plot(dts, q_sum_rapid, linewidth=lw, color='k', label=q_sum_rapid_label)
+    plt.plot(dts, q_ot_rapid, linewidth=lw, color=c1, label=q_ot_rapid_label)
+    plt.plot(dts, q_gyre_rapid, linewidth=lw, color=c2, label=q_gyre_rapid_label)
+    plt.plot(dts, q_net_rapid, linewidth=lw, color=c3, label=q_net_rapid_label)
         
     plt.xlabel('Date')
     plt.ylim([-.5,2.5])
@@ -552,11 +552,11 @@ def plot_geometric_heat_components(trans, basename='', name='simulated', obs=Non
         q_gyre_obs_label = 'Gyre (%4.2f PW)' % (obs.q_gyre.mean())
         q_ot_obs_label = 'Overturning (%4.2f PW)' % (obs.q_ot.mean())
         
-        plt.plot(obs.dates, obs.q_sum, linewidth=4, color='k',
+        plt.plot(obs.dates, obs.q_sum, linewidth=lw, color='k',
                  label=q_sum_obs_label)
-        plt.plot(obs.dates, obs.q_ot, linewidth=4, color=c1, 
+        plt.plot(obs.dates, obs.q_ot, linewidth=lw, color=c1, 
                  label=q_ot_obs_label)
-        plt.plot(obs.dates, obs.q_gyre, linewidth=4, color=c2, 
+        plt.plot(obs.dates, obs.q_gyre, linewidth=lw, color=c2, 
                  label=q_gyre_obs_label)
     
         plt.xlabel('Date')
@@ -574,7 +574,7 @@ def plot_geometric_heat_components(trans, basename='', name='simulated', obs=Non
     plt.close()
     
     
-def plot_rapid_heat_components(trans, basename='', name='simulated', obs=None):
+def plot_rapid_heat_components(trans, basename='', name='simulated', obs=None,lw=4):
     """ Plot RAPID heat transport components """
     
     # Add model data to sub-axis
@@ -596,12 +596,12 @@ def plot_rapid_heat_components(trans, basename='', name='simulated', obs=None):
     q_wbw_label = 'WBW (%4.2f PW)' % (q_wbw.mean())
     q_eddy_label = 'Eddies (%4.2f PW)' % (q_eddy.mean())
 
-    plt.plot(dts, q_sum, linewidth=4, color='k', label=q_sum_label)
-    plt.plot(dts, q_ek, linewidth=4, color=c1, label=q_ek_label)
-    plt.plot(dts, q_fc, linewidth=4, color=c2, label=q_fc_label)
-    plt.plot(dts, q_wbw, linewidth=4, color=c3, label=q_wbw_label)
-    plt.plot(dts, q_geoint, linewidth=4, color=c4, label=q_geoint_label)
-    plt.plot(dts, q_eddy, linewidth=4, color='0.5', label=q_eddy_label)
+    plt.plot(dts, q_sum, linewidth=lw, color='k', label=q_sum_label)
+    plt.plot(dts, q_ek, linewidth=lw, color=c1, label=q_ek_label)
+    plt.plot(dts, q_fc, linewidth=lw, color=c2, label=q_fc_label)
+    plt.plot(dts, q_wbw, linewidth=lw, color=c3, label=q_wbw_label)
+    plt.plot(dts, q_geoint, linewidth=lw, color=c4, label=q_geoint_label)
+    plt.plot(dts, q_eddy, linewidth=lw, color='0.5', label=q_eddy_label)
     plt.xlabel('Date')
     plt.ylim([-4,4])
     plt.ylabel('PW')
@@ -620,17 +620,17 @@ def plot_rapid_heat_components(trans, basename='', name='simulated', obs=None):
         q_wbw_obs_label = 'WBW (%4.2f PW)' % (obs.q_wbw.mean())
         q_eddy_obs_label = 'Eddies (%4.2f PW)' % (obs.q_eddy.mean())
     
-        plt.plot(obs.dates, obs.q_sum, linewidth=4, color='k',
+        plt.plot(obs.dates, obs.q_sum, linewidth=lw, color='k',
                  label=q_sum_obs_label)
-        plt.plot(obs.dates, obs.q_ek, linewidth=4, color=c1, 
+        plt.plot(obs.dates, obs.q_ek, linewidth=lw, color=c1, 
                  label=q_ek_obs_label)
-        plt.plot(obs.dates, obs.q_fc, linewidth=4, color=c2, 
+        plt.plot(obs.dates, obs.q_fc, linewidth=lw, color=c2, 
                  label=q_fc_obs_label)
-        plt.plot(obs.dates, obs.q_wbw, linewidth=4, color=c3, 
+        plt.plot(obs.dates, obs.q_wbw, linewidth=lw, color=c3, 
                  label=q_wbw_obs_label)
-        plt.plot(obs.dates, obs.q_geoint, linewidth=4, color=c4,
+        plt.plot(obs.dates, obs.q_geoint, linewidth=lw, color=c4,
                  label=q_geoint_obs_label)
-        plt.plot(obs.dates, obs.q_eddy, linewidth=4, color='0.5', 
+        plt.plot(obs.dates, obs.q_eddy, linewidth=lw, color='0.5', 
                  label=q_eddy_obs_label)
 
         plt.xlabel('Date')
@@ -648,7 +648,7 @@ def plot_rapid_heat_components(trans, basename='', name='simulated', obs=None):
     
 
 def plot_diagnostics(trans, name='simulated', outdir='./', date_format='%Y%m%d',
-                     obs_vol=None, obs_oht=None, obs_sf=None, obs_fc=None):
+                     obs_vol=None, obs_oht=None, obs_sf=None, obs_fc=None,lw=4):
     """ Plot volume and heat transport diagnostics against RAPID observations """
     
     # Create basename for output files
@@ -656,14 +656,14 @@ def plot_diagnostics(trans, name='simulated', outdir='./', date_format='%Y%m%d',
     basename = utils.get_savename(outdir, name, dts, date_format,suffix='_')
     
     # Plot data
-    plot_streamfunctions(trans, basename=basename, name=name, obs=obs_sf)
+    plot_streamfunctions(trans, basename=basename, name=name, obs=obs_sf,lw=lw)
     plot_streamfunction_hovmollers(trans, basename=basename, name=name, obs=obs_sf)
-    plot_volume_components(trans, basename=basename, name=name, obs_vol=obs_vol, obs_fc=obs_fc)
-    plot_rapid_heat_components(trans, basename=basename, name=name, obs=obs_oht)
-    plot_geometric_heat_components(trans, basename=basename, name=name, obs=obs_oht)
-    plot_zonal_mean_temperature(trans, basename=basename, name=name, obs=obs_oht)
-    plot_transport_profile(trans, basename=basename, name=name, obs=obs_oht)
-    plot_fc_transport_profile(trans, basename=basename, name=name, obs=obs_oht)
+    plot_volume_components(trans, basename=basename, name=name, obs_vol=obs_vol, obs_fc=obs_fc,lw=lw)
+    plot_rapid_heat_components(trans, basename=basename, name=name, obs=obs_oht,lw=lw)
+    plot_geometric_heat_components(trans, basename=basename, name=name, obs=obs_oht,lw=lw)
+    plot_zonal_mean_temperature(trans, basename=basename, name=name, obs=obs_oht,lw=lw)
+    plot_transport_profile(trans, basename=basename, name=name, obs=obs_oht,lw=lw)
+    plot_fc_transport_profile(trans, basename=basename, name=name, obs=obs_oht,lw=lw)
     plot_moc_vs_oht(trans, basename=basename, name=name, obs_vol=obs_vol, obs_oht=obs_oht)
     plot_vol_vs_heat_transports(trans, basename=basename, name=name, obs_vol=obs_vol, obs_oht=obs_oht)
 

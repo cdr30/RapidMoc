@@ -90,7 +90,7 @@ obs_sf = rapidobs.StreamFunctionObs(obs_sf_f, time_avg=time_avg)
 obs_vol = rapidobs.VolumeTransportObs(obs_vol_f, time_avg=time_avg)
 trans = Dataset('model_meridional_transports_at_26N.nc')
 
-rapidplot.plot_streamfunctions(trans, name='simulated', basename='', 
+rapidplot.plot_diagnostics(trans, name='simulated', basename='', 
 				      obs_sf=obs_sf, obs_oht=obs_oht,
 				      obs_vol=obs_vol, obs_fc=obs_fc)
 
