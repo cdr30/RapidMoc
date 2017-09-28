@@ -27,7 +27,7 @@ The impact of uncertainties in the geostrophic level of no motion is described f
 To install the package, run:
 
 ```bash
-pip install git+https://github.com:cdr30/RapidMoc.git#egg=RapidMoc
+pip install git+https://github.com/cdr30/RapidMoc.git#egg=RapidMoc
 ```
 
 ### Install manually
