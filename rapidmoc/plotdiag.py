@@ -250,7 +250,7 @@ def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, o
     fc = trans.variables['fc'][:]
     ekman = trans.variables['ekman'][:]
     umo = trans.variables['umo'][:]
-    moc = trans.variables['moc_rapid'][:]gg
+    moc = trans.variables['moc_rapid'][:]
 
     fc_label = 'Florida current (%6.1f Sv)' % (fc.mean())
     ek_label = 'Ekman transport (%6.1f Sv)' % (ekman.mean())
