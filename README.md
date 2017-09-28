@@ -1,4 +1,5 @@
 # RapidMoc
+
 This package calculates diagnostics of the Atlantic meridional overturning circulation (AMOC) using output from ocean general circulation models (including those with curvilinear grids) and plots comparison with observed data from the RAPID-MOCHA array at 26N. Observational data and further details about the RAPID-MOCHA array can be found [here](http://www.rapid.ac.uk/) and [here](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm).
 
 ## How to acknowledge this code
