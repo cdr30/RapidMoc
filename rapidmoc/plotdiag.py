@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
-
+import matplotlib.dates as mdates
 import numpy as np
 from scipy import stats
 
@@ -71,7 +71,13 @@ def plot_streamfunctions(trans, name='simulated', basename='', obs=None,lw=4):
     
 
 def plot_streamfunction_hovmollers(trans, name='simulated', basename='', obs=None):
-    """ Plot overturning stream function hovmoller diagrams"""
+    """ 
+    Plot overturning stream function hovmoller diagrams
+    
+    N.B. Changes to colormaps and datetimes required for older versions 
+    of matplotlib at UKMO.
+    
+    """
 
     # Extract variables from data objects
     dts = utils.get_ncdates(trans)
@@ -81,39 +87,46 @@ def plot_streamfunction_hovmollers(trans, name='simulated', basename='', obs=Non
     
    # Set up figure
     fig = plt.figure(figsize=(8,12))
-    cmap=plt.cm.viridis
+    cmap=plt.cm.jet
     levels = np.arange(15) * 2 - 4
     norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
     cmin,cmax=-5,30
+    date_format = mdates.DateFormatter('%Y')
     
     # Add model data to axis
-    fig.add_subplot(3,1,1)
-    plt.pcolormesh(dts, -z, sf_model.transpose(), 
+    ax = fig.add_subplot(3,1,1)
+    plt.pcolormesh(mdates.date2num(dts), -z, sf_model.transpose(), 
                    vmin=cmin,vmax=cmax,cmap=cmap, norm=norm)
     plt.colorbar(orientation='vertical')
     plt.title('Overturning streamfunction at 26N in %s (model velocities)' % name)
     plt.xlabel('Dates')
     plt.ylabel('Depth (m)')
-    
+    ax.xaxis.set_major_formatter(date_format)
+    fig.autofmt_xdate()
+
     # Add model data to axis (RAPID approx)
-    fig.add_subplot(3,1,2)
-    plt.pcolormesh(dts, -z, sf_rapid.transpose(), 
+    ax = fig.add_subplot(3,1,2)
+    plt.pcolormesh(mdates.date2num(dts), -z, sf_rapid.transpose(), 
                    vmin=cmin,vmax=cmax,cmap=cmap, norm=norm)
     plt.colorbar(orientation='vertical')
     plt.title('Overturning streamfunction at 26N in %s (RAPID approx)' % name)
     plt.xlabel('Dates')
     plt.ylabel('Depth (m)')
+    ax.xaxis.set_major_formatter(date_format)
+    fig.autofmt_xdate()
 
     # Add optional observed data to axis
     if obs is not None:
-        fig.add_subplot(3,1,3)
-        plt.pcolormesh(obs.dates, -obs.z, obs.sf.transpose(), 
+        ax = fig.add_subplot(3,1,3)
+        plt.pcolormesh(mdates.date2num(obs.dates), -obs.z, obs.sf.transpose(), 
                        vmin=cmin,vmax=cmax, cmap=cmap, norm=norm)
         plt.colorbar(orientation='vertical')
         plt.title('Overturning streamfunction at 26N from RAPID array')
         plt.xlabel('Dates')
         plt.ylabel('Depth (m)')
-            
+        ax.xaxis.set_major_formatter(date_format)
+        fig.autofmt_xdate()
+    
     # Save plot
     plt.tight_layout()
     savef = basename + 'overturning_streamfunction_at_26n_hovmoller.png'
@@ -256,6 +269,7 @@ def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, o
     ek_label = 'Ekman transport (%6.1f Sv)' % (ekman.mean())
     umo_label = 'Upper-mid ocean (%4.1f Sv)' % (umo.mean())
     moc_label = 'MOC (%6.1f Sv)' % (moc.mean())
+
 
     plt.plot(dts, fc, linewidth=lw, color=c1, label=fc_label)
     plt.plot(dts, ekman, linewidth=lw, color=c2, label=ek_label)

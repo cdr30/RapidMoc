@@ -114,6 +114,6 @@ def main():
         call_plotdiag(config, trans)
         
     # Write data
-    print 'SAVING: %s' % trans.filepath()
+    print 'SAVING: %s' % config.get('output', 'savefile')
     trans.close()
 

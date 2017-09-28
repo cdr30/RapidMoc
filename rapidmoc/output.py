@@ -24,7 +24,8 @@ def open_ncfile(config, dates):
         outdir, name, dates, date_format,
         suffix='_natl_meridional_transports_at_26N.nc')
     dataset = Dataset(savef, 'w', format='NETCDF4_CLASSIC')
-    
+    config.set('output', 'savefile', savef) 
+
     return dataset
 
 def create_netcdf(config, rapid_trans, model_trans, fc_trans,
@@ -55,18 +56,18 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     tdim = dataset.createDimension('time', None)
     
     # Create time coordinate
-    time = dataset.createVariable('time',np.float64,(tdim.name,))
+    time = dataset.createVariable('time',np.float64,(tdim._name,))
     time.units = 'hours since 0001-01-01 00:00:00.0'
     time.calendar = 'gregorian'
     time[:] = date2num(rapid_trans.dates, time.units, calendar=time.calendar)
 
     # Create depth coordinate 
-    z = dataset.createVariable('depth',np.float64,(zdim.name,))
+    z = dataset.createVariable('depth',np.float64,(zdim._name,))
     z.units = 'm'
     z[:] = rapid_trans.z
     
     # Create depth coordinate 
-    dz = dataset.createVariable('level_thickness',np.float64,(zdim.name,))
+    dz = dataset.createVariable('level_thickness',np.float64,(zdim._name,))
     dz.units = 'm'
     dz[:] = rapid_trans.dz
     
@@ -80,7 +81,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     dataset.method_references = '(1) McCarthy, G. D., and Coauthors, 2015: Measuring the Atlantic Meridional Overturning Circulation at 26 degrees N. Progress in Oceanography, 130, 91-111. (2) Johns, W.E., M.O. Baringer, L.M. Beal, S.A. Cunningham, T. Kanzow, H.L. Bryden, J.J. Hirschi, J. Marotzke, C.S. Meinen, B. Shaw, and R. Curry, 2011: Continuous, Array-Based Estimates of Atlantic Ocean Heat Transport at 26.5N. J. Climate, 24, 2429-2449, doi: 10.1175/2010JCLI3997.1.'
     
     # Basinwide potential temperature profile
-    t_basin = dataset.createVariable('t_basin',np.float64,(tdim.name,zdim.name))
+    t_basin = dataset.createVariable('t_basin',np.float64,(tdim._name,zdim._name))
     t_basin.units = 'degC'
     t_basin.minimum_longitude = fc_minlon
     t_basin.maximum_longitude = int_maxlon
@@ -88,7 +89,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     t_basin[:] = rapid_trans.zonal_avg_t
 
     # Florida current flow-weighted potential temperature
-    t_fc_fwt = dataset.createVariable('t_fc_fwt',np.float64,(tdim.name))
+    t_fc_fwt = dataset.createVariable('t_fc_fwt',np.float64,(tdim._name))
     t_fc_fwt.units = 'degC'
     t_fc_fwt.minimum_longitude = fc_minlon
     t_fc_fwt.maximum_longitude = fc_maxlon
@@ -96,7 +97,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     t_fc_fwt[:] = fc_trans.oht_total / (fc_trans.rhocp * fc_trans.net_transport)
     
     # Basinwide transport profile - RAPID approx
-    v_basin_rapid = dataset.createVariable('v_basin_rapid',np.float64,(tdim.name,zdim.name))
+    v_basin_rapid = dataset.createVariable('v_basin_rapid',np.float64,(tdim._name,zdim._name))
     v_basin_rapid.units = 'Sv/m'
     v_basin_rapid.minimum_longitude = fc_minlon
     v_basin_rapid.maximum_longitude = int_maxlon
@@ -104,7 +105,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     v_basin_rapid[:] = rapid_trans.zonal_sum_v / 1e6
     
     # Basinwide transport profile - model v
-    v_basin_model = dataset.createVariable('v_basin_model',np.float64,(tdim.name,zdim.name))
+    v_basin_model = dataset.createVariable('v_basin_model',np.float64,(tdim._name,zdim._name))
     v_basin_model.units = 'Sv/m'
     v_basin_model.minimum_longitude = fc_minlon
     v_basin_model.maximum_longitude = int_maxlon
@@ -112,7 +113,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     v_basin_model[:] = model_trans.zonal_sum_v / 1e6
     
     # Florida current transport profile
-    v_fc = dataset.createVariable('v_fc',np.float64,(tdim.name,zdim.name))
+    v_fc = dataset.createVariable('v_fc',np.float64,(tdim._name,zdim._name))
     v_fc.units = 'Sv/m'
     v_fc.minimum_longitude = fc_minlon
     v_fc.maximum_longitude = fc_maxlon
@@ -120,7 +121,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     v_fc[:] = fc_trans.zonal_sum_v / 1e6
     
     # Ekman transport time series
-    ekman = dataset.createVariable('ekman',np.float64,(tdim.name))
+    ekman = dataset.createVariable('ekman',np.float64,(tdim._name))
     ekman.units = 'Sv'
     ekman.minimum_longitude = wbw_maxlon
     ekman.maximum_longitude = int_maxlon
@@ -128,7 +129,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     ekman[:] = ek_trans.streamfunction[:,zind] / 1e6
     
     # Gyre interior transport time series
-    geoint = dataset.createVariable('geoint',np.float64,(tdim.name))
+    geoint = dataset.createVariable('geoint',np.float64,(tdim._name))
     geoint.units = 'Sv'
     geoint.minimum_longitude = wbw_maxlon
     geoint.maximum_longitude = int_maxlon
@@ -136,7 +137,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     geoint[:] = int_trans.streamfunction[:,zind] / 1e6
 
     # Western-boundary wedge transport time series
-    wbw = dataset.createVariable('wbw',np.float64,(tdim.name))
+    wbw = dataset.createVariable('wbw',np.float64,(tdim._name))
     wbw.units = 'Sv'
     wbw.minimum_longitude = fc_maxlon
     wbw.maximum_longitude = wbw_maxlon
@@ -144,7 +145,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     wbw[:] = wbw_trans.streamfunction[:,zind] / 1e6
 
     # Florida current transport time series
-    fc = dataset.createVariable('fc',np.float64,(tdim.name))
+    fc = dataset.createVariable('fc',np.float64,(tdim._name))
     fc.units = 'Sv'
     fc.minimum_longitude = fc_minlon
     fc.maximum_longitude = fc_maxlon
@@ -152,7 +153,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fc[:] = fc_trans.streamfunction[:,zind] / 1e6
 
     # Upper mid ocean transport time series
-    umo = dataset.createVariable('umo',np.float64,(tdim.name))
+    umo = dataset.createVariable('umo',np.float64,(tdim._name))
     umo.units = 'Sv'
     umo.minimum_longitude = fc_maxlon
     umo.maximum_longitude = int_maxlon
@@ -160,7 +161,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     umo[:] = wbw[:] + geoint[:]
     
     # Meridional overturning transport time series - RAPID approx
-    moc_rapid = dataset.createVariable('moc_rapid',np.float64,(tdim.name))
+    moc_rapid = dataset.createVariable('moc_rapid',np.float64,(tdim._name))
     moc_rapid.units = 'Sv'
     moc_rapid.minimum_longitude = fc_minlon
     moc_rapid.maximum_longitude = int_maxlon
@@ -168,7 +169,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     moc_rapid[:] =  rapid_trans.streamfunction[:,zind] / 1e6
 
     # Meridional overturning transport time series - model v
-    moc_model = dataset.createVariable('moc_model',np.float64,(tdim.name))
+    moc_model = dataset.createVariable('moc_model',np.float64,(tdim._name))
     moc_model.units = 'Sv'
     moc_model.minimum_longitude = fc_minlon
     moc_model.maximum_longitude = int_maxlon
@@ -176,7 +177,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     moc_model[:] =  model_trans.streamfunction[:,zind] / 1e6
     
     # Meridional overturning transport maxima time series - RAPID approx
-    mocmax_rapid = dataset.createVariable('mocmax_rapid',np.float64,(tdim.name))
+    mocmax_rapid = dataset.createVariable('mocmax_rapid',np.float64,(tdim._name))
     mocmax_rapid.units = 'Sv'
     mocmax_rapid.minimum_longitude = fc_minlon
     mocmax_rapid.maximum_longitude = int_maxlon
@@ -184,7 +185,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     mocmax_rapid[:] =  rapid_trans.streamfunction.max(axis=1) / 1e6
 
     # Meridional overturning transport maxima time series - model v
-    mocmax_model = dataset.createVariable('mocmax_model',np.float64,(tdim.name))
+    mocmax_model = dataset.createVariable('mocmax_model',np.float64,(tdim._name))
     mocmax_model.units = 'Sv'
     mocmax_model.minimum_longitude = fc_minlon
     mocmax_model.maximum_longitude = int_maxlon
@@ -192,7 +193,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     mocmax_model[:] =  model_trans.streamfunction.max(axis=1) / 1e6
         
     # Overturning streamfunctions - RAPID approx
-    sf_rapid = dataset.createVariable('sf_rapid',np.float64,(tdim.name,zdim.name))
+    sf_rapid = dataset.createVariable('sf_rapid',np.float64,(tdim._name,zdim._name))
     sf_rapid.units = 'Sv'
     sf_rapid.minimum_longitude = fc_minlon
     sf_rapid.maximum_longitude = int_maxlon
@@ -200,7 +201,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     sf_rapid[:] =  rapid_trans.streamfunction/ 1e6
 
     # Meridional overturning transport time series - model v
-    sf_model = dataset.createVariable('sf_model',np.float64,(tdim.name,zdim.name))
+    sf_model = dataset.createVariable('sf_model',np.float64,(tdim._name,zdim._name))
     sf_model.units = 'Sv'
     sf_model.minimum_longitude = fc_minlon
     sf_model.maximum_longitude = int_maxlon
@@ -208,7 +209,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     sf_model[:] =  model_trans.streamfunction / 1e6
     
     # Florida current stream function 
-    sf_fc = dataset.createVariable('sf_fc',np.float64,(tdim.name,zdim.name))
+    sf_fc = dataset.createVariable('sf_fc',np.float64,(tdim._name,zdim._name))
     sf_fc.units = 'Sv'
     sf_fc.minimum_longitude = fc_minlon
     sf_fc.maximum_longitude = fc_maxlon
@@ -216,7 +217,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     sf_fc[:] =  fc_trans.streamfunction/ 1e6
     
     # Ekman stream function 
-    sf_ek = dataset.createVariable('sf_ek',np.float64,(tdim.name,zdim.name))
+    sf_ek = dataset.createVariable('sf_ek',np.float64,(tdim._name,zdim._name))
     sf_ek.units = 'Sv'
     sf_ek.minimum_longitude = wbw_maxlon
     sf_ek.maximum_longitude = int_maxlon
@@ -224,7 +225,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     sf_ek[:] =  ek_trans.streamfunction/ 1e6
     
     # Wbw stream function 
-    sf_wbw = dataset.createVariable('sf_wbw',np.float64,(tdim.name,zdim.name))
+    sf_wbw = dataset.createVariable('sf_wbw',np.float64,(tdim._name,zdim._name))
     sf_wbw.units = 'Sv'
     sf_wbw.minimum_longitude = fc_minlon
     sf_wbw.maximum_longitude = wbw_maxlon
@@ -232,7 +233,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     sf_wbw[:] =  wbw_trans.streamfunction/ 1e6
     
     # Geostrophic interior stream function 
-    sf_geoint = dataset.createVariable('sf_geoint',np.float64,(tdim.name,zdim.name))
+    sf_geoint = dataset.createVariable('sf_geoint',np.float64,(tdim._name,zdim._name))
     sf_geoint.units = 'Sv'
     sf_geoint.minimum_longitude = wbw_maxlon
     sf_geoint.maximum_longitude = int_maxlon
@@ -240,7 +241,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     sf_geoint[:] =  int_trans.streamfunction/ 1e6
     
     # mid ocean stream function 
-    sf_mo = dataset.createVariable('sf_mo',np.float64,(tdim.name,zdim.name))
+    sf_mo = dataset.createVariable('sf_mo',np.float64,(tdim._name,zdim._name))
     sf_mo.units = 'Sv'
     sf_mo.minimum_longitude = fc_maxlon
     sf_mo.maximum_longitude = int_maxlon
@@ -248,7 +249,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     sf_mo[:] =  sf_geoint[:] + sf_wbw[:]
     
     # Total heat transport - RAPID approx
-    q_sum_rapid = dataset.createVariable('q_sum_rapid',np.float64,(tdim.name))
+    q_sum_rapid = dataset.createVariable('q_sum_rapid',np.float64,(tdim._name))
     q_sum_rapid.units = 'PW'
     q_sum_rapid.minimum_longitude = fc_minlon
     q_sum_rapid.maximum_longitude = int_maxlon
@@ -256,7 +257,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_sum_rapid[:] = rapid_trans.oht_total / 1e15
         
     # Gyre heat transport - RAPID approx
-    q_gyre_rapid = dataset.createVariable('q_gyre_rapid',np.float64,(tdim.name))
+    q_gyre_rapid = dataset.createVariable('q_gyre_rapid',np.float64,(tdim._name))
     q_gyre_rapid.units = 'PW'
     q_gyre_rapid.minimum_longitude = fc_minlon
     q_gyre_rapid.maximum_longitude = int_maxlon
@@ -264,7 +265,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_gyre_rapid[:] = rapid_trans.oht_by_horizontal / 1e15
     
     # Overturning heat transport - RAPID approx
-    q_ot_rapid = dataset.createVariable('q_ot_rapid',np.float64,(tdim.name))
+    q_ot_rapid = dataset.createVariable('q_ot_rapid',np.float64,(tdim._name))
     q_ot_rapid.units = 'PW'
     q_ot_rapid.minimum_longitude = fc_minlon
     q_ot_rapid.maximum_longitude = int_maxlon
@@ -272,7 +273,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_ot_rapid[:] = rapid_trans.oht_by_overturning / 1e15
     
     # Heat transport by net throughflow - RAPID approx
-    q_net_rapid = dataset.createVariable('q_net_rapid',np.float64,(tdim.name))
+    q_net_rapid = dataset.createVariable('q_net_rapid',np.float64,(tdim._name))
     q_net_rapid.units = 'PW'
     q_net_rapid.minimum_longitude = fc_minlon
     q_net_rapid.maximum_longitude = int_maxlon
@@ -280,7 +281,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_net_rapid[:] = rapid_trans.oht_by_net / 1e15
     
     # Total heat transport - model v
-    q_sum_model = dataset.createVariable('q_sum_model',np.float64,(tdim.name))
+    q_sum_model = dataset.createVariable('q_sum_model',np.float64,(tdim._name))
     q_sum_model.units = 'PW'
     q_sum_model.minimum_longitude = fc_minlon
     q_sum_model.maximum_longitude = int_maxlon
@@ -288,7 +289,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_sum_model[:] = model_trans.oht_total / 1e15
     
     # Gyre heat transport -model v
-    q_gyre_model = dataset.createVariable('q_gyre_model',np.float64,(tdim.name))
+    q_gyre_model = dataset.createVariable('q_gyre_model',np.float64,(tdim._name))
     q_gyre_model.units = 'PW'
     q_gyre_model.minimum_longitude = fc_minlon
     q_gyre_model.maximum_longitude = int_maxlon
@@ -296,7 +297,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_gyre_model[:] = model_trans.oht_by_horizontal / 1e15
     
     # Overturning heat transport - model v
-    q_ot_model = dataset.createVariable('q_ot_model',np.float64,(tdim.name))
+    q_ot_model = dataset.createVariable('q_ot_model',np.float64,(tdim._name))
     q_ot_model.units = 'PW'
     q_ot_model.minimum_longitude = fc_minlon
     q_ot_model.maximum_longitude = int_maxlon
@@ -304,7 +305,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_ot_model[:] = model_trans.oht_by_overturning / 1e15
     
     # Heat transport by net throughflow - model v
-    q_net_model = dataset.createVariable('q_net_model',np.float64,(tdim.name))
+    q_net_model = dataset.createVariable('q_net_model',np.float64,(tdim._name))
     q_net_model.units = 'PW'
     q_net_model.minimum_longitude = fc_minlon
     q_net_model.maximum_longitude = int_maxlon
@@ -312,7 +313,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_net_model[:] = model_trans.oht_by_net / 1e15
         
     # Heat transport by florida current
-    q_fc = dataset.createVariable('q_fc',np.float64,(tdim.name))
+    q_fc = dataset.createVariable('q_fc',np.float64,(tdim._name))
     q_fc.units = 'PW'
     q_fc.minimum_longitude = fc_minlon
     q_fc.maximum_longitude = fc_maxlon
@@ -320,7 +321,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_fc[:] = fc_trans.oht_total / 1e15
     
     # Heat transport by ekman
-    q_ek = dataset.createVariable('q_ek',np.float64,(tdim.name))
+    q_ek = dataset.createVariable('q_ek',np.float64,(tdim._name))
     q_ek.units = 'PW'
     q_ek.minimum_longitude = wbw_maxlon
     q_ek.maximum_longitude = int_maxlon
@@ -328,7 +329,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_ek[:] = ek_trans.oht_total / 1e15
     
     # Heat transport by wbw
-    q_wbw = dataset.createVariable('q_wbw',np.float64,(tdim.name))
+    q_wbw = dataset.createVariable('q_wbw',np.float64,(tdim._name))
     q_wbw.units = 'PW'
     q_wbw.minimum_longitude = fc_maxlon
     q_wbw.maximum_longitude = wbw_maxlon
@@ -336,7 +337,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_wbw[:] = wbw_trans.oht_total / 1e15
     
     # Heat transport by zonal mean geostrophic interior
-    q_geoint = dataset.createVariable('q_geoint',np.float64,(tdim.name))
+    q_geoint = dataset.createVariable('q_geoint',np.float64,(tdim._name))
     q_geoint.units = 'PW'
     q_geoint.minimum_longitude = wbw_maxlon
     q_geoint.maximum_longitude = int_maxlon
@@ -344,7 +345,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_geoint[:] = (int_trans.oht_total - int_trans.oht_by_horizontal )/ 1e15
     
     # Heat transport by standing "eddy" component of geostrophic interior
-    q_eddy = dataset.createVariable('q_eddy',np.float64,(tdim.name))
+    q_eddy = dataset.createVariable('q_eddy',np.float64,(tdim._name))
     q_eddy.units = 'PW'
     q_eddy.minimum_longitude = wbw_maxlon
     q_eddy.maximum_longitude = int_maxlon
@@ -352,7 +353,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_eddy[:] = (int_trans.oht_by_horizontal )/ 1e15
         
     # Heat transport by mid ocean
-    q_mo = dataset.createVariable('q_mo',np.float64,(tdim.name))
+    q_mo = dataset.createVariable('q_mo',np.float64,(tdim._name))
     q_mo.units = 'PW'
     q_mo.minimum_longitude = wbw_maxlon
     q_mo.maximum_longitude = int_maxlon
