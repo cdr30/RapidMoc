@@ -305,10 +305,14 @@ def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, o
         
 def linreg_vol_vs_oht(vol,oht):
     """ Return linear regression of volume vs heat transports """
-    slope, intercept, r_value, p_value, std_err =  stats.linregress(vol,oht)
-    oht_model = vol * slope + intercept
-    label = '%5.3f PW/Sv' % slope
-    
+    if len(vol) > 1:
+        slope, intercept, r_value, p_value, std_err =  stats.linregress(vol,oht)
+        oht_model = vol * slope + intercept
+        label = '(%5.3f PW/Sv)' % slope
+    else:
+        oht_model = None
+        label = ''
+
     return oht_model, label
 
         
@@ -329,12 +333,14 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
     q_gyre_model_lin, q_gyre_model_label = linreg_vol_vs_oht(moc_model, q_gyre_model)
     q_ot_model_lin, q_ot_model_label = linreg_vol_vs_oht(moc_model, q_ot_model)
     
-    plt.plot(moc_model, q_sum_model,'x', color='k')
-    plt.plot(moc_model, q_sum_model_lin,'-', color='k', label='total (%s)' % q_sum_model_label)
-    plt.plot(moc_model, q_ot_model,'x', color=c1)
-    plt.plot(moc_model, q_ot_model_lin,'-', color=c1, label='overturning (%s)' % q_ot_model_label)
-    plt.plot(moc_model, q_gyre_model,'x', color=c2)
-    plt.plot(moc_model, q_gyre_model_lin,'-', color=c2, label='gyre (%s)' % q_gyre_model_label)
+    plt.plot(moc_model, q_sum_model,'x', color='k', label='total %s' % q_sum_model_label)
+    plt.plot(moc_model, q_ot_model,'x', color=c1, label='overturning %s' % q_ot_model_label)
+    plt.plot(moc_model, q_gyre_model,'x', color=c2, label='gyre %s' % q_gyre_model_label)
+
+    if q_sum_model_lin is not None:
+        plt.plot(moc_model, q_sum_model_lin,'-', color='k')
+        plt.plot(moc_model, q_ot_model_lin,'-', color=c1)
+        plt.plot(moc_model, q_gyre_model_lin,'-', color=c2)
     
     plt.xlabel('MOC (Sv)')
     plt.ylabel('Heat transport (PW)')
@@ -354,12 +360,14 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
     q_gyre_rapid_lin, q_gyre_rapid_label = linreg_vol_vs_oht(moc_rapid, q_gyre_rapid)
     q_ot_rapid_lin, q_ot_rapid_label = linreg_vol_vs_oht(moc_rapid, q_ot_rapid)
 
-    plt.plot(moc_rapid, q_sum_rapid,'x', color='k')
-    plt.plot(moc_rapid, q_sum_rapid_lin,'-', color='k', label='total (%s)' % q_sum_rapid_label)
-    plt.plot(moc_rapid, q_ot_rapid,'x', color=c1)
-    plt.plot(moc_rapid, q_ot_rapid_lin,'-', color=c1, label='overturning (%s)' % q_ot_rapid_label)
-    plt.plot(moc_rapid, q_gyre_rapid,'x', color=c2)
-    plt.plot(moc_rapid, q_gyre_rapid_lin,'-', color=c2, label='gyre (%s)' % q_gyre_rapid_label)
+    plt.plot(moc_rapid, q_sum_rapid,'x', color='k', label='total %s' % q_sum_rapid_label)
+    plt.plot(moc_rapid, q_ot_rapid,'x', color=c1, label='overturning %s' % q_ot_rapid_label)
+    plt.plot(moc_rapid, q_gyre_rapid,'x', color=c2, label='gyre %s' % q_gyre_rapid_label)
+
+    if q_sum_rapid_lin is not None:
+        plt.plot(moc_rapid, q_sum_rapid_lin,'-', color='k')
+        plt.plot(moc_rapid, q_ot_rapid_lin,'-', color=c1)
+        plt.plot(moc_rapid, q_gyre_rapid_lin,'-', color=c2)
 
     plt.xlabel('MOC (Sv)')
     plt.ylabel('Heat transport (PW)')
@@ -382,13 +390,15 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
         q_sum_obs_lin, q_sum_obs_label = linreg_vol_vs_oht(moc_obs, q_sum_obs)
         q_gyre_obs_lin, q_gyre_obs_label = linreg_vol_vs_oht(moc_obs, q_gyre_obs)
         q_ot_obs_lin, q_ot_obs_label = linreg_vol_vs_oht(moc_obs, q_ot_obs)
-    
-        plt.plot(moc_obs, q_sum_obs,'x', color='k')
-        plt.plot(moc_obs, q_sum_obs_lin,'-', color='k', label='total (%s)' % q_sum_obs_label)
-        plt.plot(moc_obs, q_ot_obs,'x', color=c1)
-        plt.plot(moc_obs, q_ot_obs_lin,'-', color=c1, label='overturning (%s)' % q_ot_obs_label)
-        plt.plot(moc_obs, q_gyre_obs,'x', color=c2)
-        plt.plot(moc_obs, q_gyre_obs_lin,'-', color=c2, label='gyre (%s)' % q_gyre_obs_label)
+        
+        plt.plot(moc_obs, q_sum_obs,'x', color='k', label='total %s' % q_sum_obs_label)
+        plt.plot(moc_obs, q_ot_obs,'x', color=c1, label='overturning %s' % q_ot_obs_label)
+        plt.plot(moc_obs, q_gyre_obs,'x', color=c2, label='gyre %s' % q_gyre_obs_label)
+        
+        if q_sum_obs_lin is not None:
+            plt.plot(moc_obs, q_sum_obs_lin,'-', color='k')       
+            plt.plot(moc_obs, q_ot_obs_lin,'-', color=c1)
+            plt.plot(moc_obs, q_gyre_obs_lin,'-', color=c2)
 
         plt.xlabel('MOC (Sv)')
         plt.ylabel('Heat transport (PW)')
@@ -440,12 +450,14 @@ def plot_vol_vs_heat_transports(trans, basename='', name='simulated', obs_vol=No
     fig = plt.figure(figsize=(15,5))
     fig.add_subplot(1,3,1)
 
-    plt.plot(ek, q_ek,'x', color=c1)
-    plt.plot(ek, q_ek_lin,'-', color=c1, label='%s (%s)' % (name, q_ek_label))
+    plt.plot(ek, q_ek,'x', color=c1, label='%s %s' % (name, q_ek_label))
+    if q_ek_lin is not None:
+        plt.plot(ek, q_ek_lin,'-', color=c1)
    
     if (obs_vol is not None) and (obs_oht is not None):
-        plt.plot(ek_obs, q_ek_obs,'x', color='k')
-        plt.plot(ek_obs, q_ek_obs_lin,'-', color='k', label='RAPID observations (%s)' % q_ek_obs_label)
+        plt.plot(ek_obs, q_ek_obs,'x', color='k', label='RAPID observations %s' % q_ek_obs_label)
+        if q_ek_obs_lin is not None:
+            plt.plot(ek_obs, q_ek_obs_lin,'-', color='k')
         
     plt.xlabel('Volume transport (Sv)')
     plt.ylabel('Heat transport (PW)')
@@ -455,12 +467,14 @@ def plot_vol_vs_heat_transports(trans, basename='', name='simulated', obs_vol=No
     # Plot florida current 
     fig.add_subplot(1,3,2)
 
-    plt.plot(fc, q_fc,'x', color=c1)
-    plt.plot(fc, q_fc_lin,'-', color=c1, label='%s (%s)' % (name, q_fc_label))
+    plt.plot(fc, q_fc,'x', color=c1, label='%s %s' % (name, q_fc_label))
+    if q_fc_lin is not None:
+        plt.plot(fc, q_fc_lin,'-', color=c1)
 
     if (obs_vol is not None) and (obs_oht is not None):
-        plt.plot(fc_obs, q_fc_obs,'x', color='k')
-        plt.plot(fc_obs, q_fc_obs_lin,'-', color='k', label='RAPID observations (%s)' % q_fc_obs_label)
+        plt.plot(fc_obs, q_fc_obs,'x', color='k', label='RAPID observations %s' % q_fc_obs_label)
+        if q_fc_obs_lin is not None:
+            plt.plot(fc_obs, q_fc_obs_lin,'-', color='k')
    
     plt.xlabel('Volume transport (Sv)')
     plt.ylabel('Heat transport (PW)')
@@ -470,12 +484,14 @@ def plot_vol_vs_heat_transports(trans, basename='', name='simulated', obs_vol=No
     # Plot mid-ocean 
     fig.add_subplot(1,3,3)
     
-    plt.plot(umo, q_mo,'x', color=c1)
-    plt.plot(umo, q_mo_lin,'-', color=c1, label='%s (%s)' % (name, q_mo_label))
+    plt.plot(umo, q_mo,'x', color=c1, label='%s %s' % (name, q_mo_label))
+    if q_mo_lin is not None:
+        plt.plot(umo, q_mo_lin,'-', color=c1)
    
     if (obs_vol is not None) and (obs_oht is not None):
-        plt.plot(umo_obs, q_mo_obs,'x', color='k')
-        plt.plot(umo_obs, q_mo_obs_lin,'-', color='k', label='RAPID observations (%s)' % q_mo_obs_label)
+        plt.plot(umo_obs, q_mo_obs,'x', color='k', label='RAPID observations %s' % q_mo_obs_label)
+        if q_mo_obs_lin is not None:
+            plt.plot(umo_obs, q_mo_obs_lin,'-', color='k')
 
     plt.xlabel('Volume transport (Sv)')
     plt.ylabel('Heat transport (PW)')
