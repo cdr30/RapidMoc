@@ -21,6 +21,17 @@ In order to provide the most appropriate comparisons, RapidMoc calculates model 
 The impact of uncertainties in the geostrophic level of no motion is described further by [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full).
 
 ## Using RapidMoc
+
+### Install package
+
+To install the package, run:
+
+```bash
+pip install git+https://github.com/cdr30/RapidMoc.git#egg=RapidMoc
+```
+
+### Install manually
+
 #### Required python libraries
 RapidMoc was developed using Python 2.7 and requires the installation of the following python libraries and their associated dependencies: `numpy`, `netCDF4`, `ConfigParser`, `argparse`, `os`, `matplotlib`, `abc`, `datetime`, `scipy`, `copy`, and `math`. 
 
