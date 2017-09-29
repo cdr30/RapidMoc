@@ -75,21 +75,24 @@ run_rapidmoc.py  config.ini "/path/to/tfiles_????.nc" "/path/to/sfiles_????.nc" 
 
 
 ## Model data
-The methods used by RapidMoc are robust across different ocean model grids, but all model data is assumed to be shaped as follows:
+In order to calculate meridional volume and heat transports, RapidMoc requires the following ocean variables: temperature (T), salinity (S), across-section velocity  (V), and along-section wind stress (taux). The methods used by RapidMoc are robust across different ocean model grids, but all model data is assumed to be shaped as follows:
 
 ```
 3D fields (i.e. T, S, V) = (nt,nz,ny,nx)
-2D fields (i.e. tau) = (nt,ny,nx)
+2D fields (i.e. taux) = (nt,ny,nx)
 
 ```
-where the x-coordinate is assumed to be approximately zonal, and the y-coordinate is assumed to be approximately meridional. Some deviations from this assumption are accounted for when estimating cell bounds and for along-section interpolation of data onto the velocity grid. These operations are designed to work with generalized curvilinear coordinate grids (e.g. the NEMO ORCA grid) and different grid stencils. However, it is assumed throughout the code that sub-sections can be selected using longitude pairs. Extracted sections that do not have an x-coordinate of monotonically increasing longitude data will probably not behave as expected.
+where the x-coordinate is along-section and assumed to be approximately zonal, and the y-coordinate is across-section and assumed to be approximately meridional. Some deviations from this assumption are accounted for when estimating cell bounds and for along-section interpolation of data onto the velocity grid. These operations are designed to work with generalized curvilinear coordinate grids (e.g. the NEMO ORCA grid) and different grid stencils. However, it is assumed throughout the code that sub-sections can be selected using longitude pairs. Extracted sections that do not have an x-coordinate of monotonically increasing longitude data will probably not behave as expected.
 
 ## Observational data
-In order to use the plotting functionality of RapidMoc, the following observational data sets must be downloaded from the RAPID-MOCHA project web-pages:
+To optionally include observational data in plots, include the `[observations]` section in the configuration file. The required data can be downloaded from the RAPID-MOCHA project and NOAA web-pages:
 
 * `mocha_mht_data_*.nc` - a netcdf file containing heat transport data available from the [MOCHA project web site](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm)  
 
 * `moc_vertical_*.nc` and `moc_transports_*.nc` - netcdf files containing volume transports and overturning stream functions available from the [RAPID project web site](http://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php).
+
+* `FC_cable_transport*.nc` - Florida cable transports can be retrieved and converted to netcdf using `./scripts/get_florida_current_data.ksh`
+
 
 ## Plotting API
 The plotting API can be accessed without having to re-run the RapidMoc calculation.  This interface is designed to be used when it necessary to run RapidMoc on multiple "chunks" of data before combining the output into a single netcdf file to create the plots.
