@@ -159,7 +159,7 @@ plot = boolean used to enable/disable plotting [boolean]
 outdir = path to output directory where data/plots are saved [string]
 ```
 
-Note that it is possible to specify a range of indices in the y-direction. If `j1 != j2`, then data is extracted over a range of j-indices and then averaged to create a single zonal section. This allows data to be specified in a way that allows temperature and salinity to be averaged onto the velocity section in a way that respects the staggering of the original model grid. 
+Note that it is possible to specify a range of indices in the y-direction. If `j1 != j2`, then data is extracted over a range of j-indices and then averaged to create a single zonal section. This allows temperature and salinity to be averaged onto the velocity section in a way that respects the staggering of the original model grid. 
 
 ## Example plots
 ![basinwide_transport_profile.png](example_plots/basinwide_transport_profile.png)
