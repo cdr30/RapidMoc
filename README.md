@@ -147,9 +147,9 @@ time_avg = monthly or yearly [string, optional]
 georef_level = depth used as geostrophic level of no motion [float]
 ekman_depth = depth used as bottom of ekman layer [float]
 ek_profile_type = determines how ekman transports are distributed over the Ekman layer. [string, 'uniform' or 'linear']
-fc_minlon = longitude corresponding to western boundary of florida current [float, -180 to 180]
-fc_maxlon = longitude corresponding to boundary between florida current and wbw [float, -180 to 180]
-wbw_maxlon = longitude corresponding to boundary between wbw and geostrophic interior [float, -180 to 180]
+fc_minlon = longitude corresponding to western boundary of simulated florida current [float, -180 to 180]
+fc_maxlon = longitude corresponding to boundary between simulated florida current and the western boundary wedge containing the simulated deep western boundary current [float, -180 to 180]
+wbw_maxlon = longitude corresponding to boundary between the western boundary wedge containing the simulated deep western boundary current and the geostrophic interior [float, -180 to 180]
 int_maxlon = longitude corresponding to eastern boundary of geostrophic interior [float, -180 to 180]
 
 [output]
@@ -159,7 +159,7 @@ plot = boolean used to enable/disable plotting [boolean]
 outdir = path to output directory where data/plots are saved [string]
 ```
 
-Note that it is possible to specify a range of indices in the y-direction. If `j1 != j2`, then data is extracted over a range of j-indices and then averaged to create a single zonal section. This allows data to be specified in a way that respects the staggering of the original model grid. 
+Note that it is possible to specify a range of indices in the y-direction. If `j1 != j2`, then data is extracted over a range of j-indices and then averaged to create a single zonal section. This allows temperature and salinity to be averaged onto the velocity section in a way that respects the staggering of the original model grid. 
 
 ## Example plots
 ![basinwide_transport_profile.png](example_plots/basinwide_transport_profile.png)
