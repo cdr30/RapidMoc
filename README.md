@@ -119,7 +119,24 @@ rapidplot.plot_diagnostics(trans, name='simulated', basename='',
 Example plots are included at the end of this document.
 
 ## Configuration files
-In order to run RapidMoc, it is necessary to provide a `config.ini` that describes the ocean model data format and specifies options for the RapidMoc calculation. Several example `config.ini` files are provided within the  `etc/` directory. A description of the contents of the `config.ini` file is provided below.
+In order to run RapidMoc, it is necessary to provide a `config.ini` that describes the ocean model data format and specifies options for the RapidMoc calculation. Several example `config.ini` files are provided within the  `etc/` directory. 
+
+#### Specifying longitude bounds of RAPID domains
+The RAPID-style calculation requires specification of the longitude bounds for each region. These are specified using the following variables in the `config.ini` file: `fc_minlon`, `fc_maxlon`, `wbw_maxlon` and `int_maxlon`. These values will be model specific and should be chosen using the following criteria:
+
+* The model-analogue to the Florida Current should lie between `fc_minlon` and `fc_maxlon`. If the Straits of Florida are not resolved, then choose these values based on the width of the northward transport contained by the simulated western boundary current. 
+* The model-analogues to the Antilles Current and Deep Western Boundary current should lie between `fc_maxlon` and `wbw_maxlon`. 
+* The geostrophic interior is specified by the region between `wbw_maxlon` and `int_maxlon`.
+
+#### `plot_rapid_regions.py`
+The `plot_rapid_regions.py` is found within the `scripts` directory and is used to visualize the RAPID boundaries on top of meridional velocity data as specified within a particular `config.ini` file. Some example plots showing the tuned RAPID domains for ORCA025 and ORCA1 configurations of the NEMO ocean model are included below.
+
+#### Example plots showing the RAPID regions in different resolution models
+![orca1.png](example_plots/orca1.png)
+![orca025.png](example_plots/orca025.png)
+
+
+#### Annotated example of `config.ini`
 
 ```
 [temperature/salinity/tau/meridional_velocity]
