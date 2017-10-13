@@ -1,5 +1,5 @@
 # RapidMoc
-This package calculates diagnostics of the Atlantic meridional overturning circulation (AMOC) using output from ocean general circulation models (including those with curvilinear grids) and plots comparison with observed data from the RAPID-MOCHA array at 26N. Observational data and further details about the RAPID-MOCHA array can be found [here](http://www.rapid.ac.uk/) and [here](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm).
+This package calculates volume, heat, and freshwater transport diagnostics of the Atlantic meridional overturning circulation (AMOC) using output from ocean general circulation models (including those with curvilinear grids) and plots comparison with observed data from the RAPID-MOCHA array at 26N. Observational data and further details about the RAPID-MOCHA array can be found [here](http://www.rapid.ac.uk/) and [here](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm).
 
 ## How to acknowledge this code
 If you use RapidMoc in analysis for a journal article, please cite [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full), which includes a full description of the methodology.
@@ -17,6 +17,8 @@ In order to provide the most appropriate comparisons, RapidMoc calculates model 
 * Meridional Ekman transports are calculated from zonal wind stress.
 * Interior geostrophic transports are calculated relative to a specified level of no motion.
 * A mass-compensation term is applied as a uniform adjustment to the interior geostrophic velocity field to ensure zero net-flow across the section.
+* Heat and temperature transports are calculated following [Johns et al.  (2011)](http://journals.ametsoc.org/doi/abs/10.1175/2010JCLI3997.1).
+* Equivalent fresh water transports are calculated following [McDonagh et al. (2015)](http://journals.ametsoc.org/doi/abs/10.1175/JCLI-D-14-00519.1).
 
 The impact of uncertainties in the geostrophic level of no motion is described further by [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full).
 
@@ -125,8 +127,10 @@ In order to run RapidMoc, it is necessary to provide a `config.ini` that describ
 The RAPID-style calculation requires specification of the longitude bounds for each region. These are specified using the following variables in the `config.ini` file: `fc_minlon`, `fc_maxlon`, `wbw_maxlon` and `int_maxlon`. These values will be model specific and should be chosen using the following criteria:
 
 * The model-analogue to the Florida Current should lie between `fc_minlon` and `fc_maxlon`. If the Straits of Florida are not resolved, then choose these values based on the width of the northward transport contained by the simulated western boundary current. 
-* The model-analogues to the Antilles Current and Deep Western Boundary current should lie between `fc_maxlon` and `wbw_maxlon`. 
-* The geostrophic interior is specified by the region between `wbw_maxlon` and `int_maxlon`.
+* The model-analogues to the northward flowing Antilles Current (centered at ~400m) and southward flowing Deep Western Boundary Current should lie between `fc_maxlon` and `wbw_maxlon`. 
+* The geostrophic interior is specified by the region between `wbw_maxlon` and the eastern boundary, `int_maxlon`
+
+
 
 #### `plot_rapid_regions.py`
 The `plot_rapid_regions.py` is found within the `scripts` directory and is used to visualize the RAPID boundaries on top of meridional velocity data as specified within a particular `config.ini` file. Some example plots showing the tuned RAPID domains for ORCA025 and ORCA1 configurations of the NEMO ocean model are included below.

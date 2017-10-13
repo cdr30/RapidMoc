@@ -61,15 +61,15 @@ florida_current=/var/tmp/necr/dat/obs/florida_straits/FC_cable_transport_1982-20
 time_avg=monthly
 
 [options]
-name=gp69
-plot=True
-outdir=/home/rd/necr/tmp/rapidmoc/ 
 georef_level = 4750
 ekman_depth = 50
-# Set longitude boundaries for each component
-fs_minlon = -81.0
-# fs_maxlon -> ORCA025 = -78.4, ORCA1 = -76.0
-fs_maxlon = -76.0
-# wbw_maxlon -> ORCA025 = -76.1, ORCA1 = -73.0
+fc_minlon = -81.0
+fc_maxlon = -75.5
 wbw_maxlon = -73.0
 int_maxlon = -10.
+ek_profile_type = linear
+
+[output]
+date_format=%Y
+plot=True
+outdir=/home/rd/necr/tmp/rapidmoc/
