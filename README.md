@@ -77,7 +77,7 @@ run_rapidmoc.py  config.ini "/path/to/tfiles_????.nc" "/path/to/sfiles_????.nc" 
 
 
 ## Model data
-In order to calculate meridional volume and heat transports, RapidMoc requires the following ocean variables: temperature (T), salinity (S), across-section velocity  (V), and along-section wind stress (taux). The methods used by RapidMoc are robust across different ocean model grids, but all model data is assumed to be shaped as follows:
+In order to calculate meridional volume, heat and freshwater transports, RapidMoc requires the following ocean variables: temperature (T), salinity (S), across-section velocity  (V), and along-section wind stress (taux). The methods used by RapidMoc are robust across different ocean model grids, but all model data is assumed to be shaped as follows:
 
 ```
 3D fields (i.e. T, S, V) = (nt,nz,ny,nx)
