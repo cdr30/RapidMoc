@@ -285,7 +285,7 @@ def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, o
             plt.plot(obs_vol.dates, obs_vol.moc, linewidth=lw, color='k', label=moc_obs_label)
 
         if obs_fc is not None:
-            fc_obs_ext_label = 'FC - extended (%6.1f Sv)' % (obs_fc.fc.mean())
+            fc_obs_ext_label = 'FC - extended (%6.1f Sv)' % (np.nanmean(obs_fc.fc))
             plt.plot(obs_fc.dates, obs_fc.fc, linewidth=lw, color=c4, label=fc_obs_ext_label)
             
 

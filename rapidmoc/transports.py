@@ -15,19 +15,21 @@ G = 9.81          # Gravitational acceleration (m/s2)
 ROT = 7.292116E-5 # Rotation rate of earth (rad/s) 
 RHO_REF = 1025.   # Reference density for sea water (kg/m3)
 CP = 3985         # Specific heat capacity of sea water (J/kg/K)
-
+SREF = 35.17      # Mean salinity for the section (PSU)
     
 class Transports(object):
     """ Class to interface with volume and heat transport diagnostics """
     
-    def __init__(self, v, t_on_v,minind,maxind):
+    def __init__(self, v, t_on_v,s_on_v,minind,maxind):
         """ Initialize with velocity and temperature sections """
         
         # Initialize data
         self.name = v.name
         self.v = v.data[:,:,minind:maxind]
         self.t = t_on_v.data[:,:,minind:maxind]
+	self.s = s_on_v.data[:,:,minind:maxind]
         self.rhocp = RHO_REF * CP
+	self.sref = SREF
         self.x = v.x[minind:maxind]        
         self.y = v.y[minind:maxind]
         self.z = v.z
@@ -40,6 +42,7 @@ class Transports(object):
         
         # Set null values for property attributes
         self._avg_t = None
+	self._avg_s = None
         self._avg_v = None
         self._v_no_net = None
         self._net_transport = None
@@ -50,11 +53,17 @@ class Transports(object):
         self._zonal_sum_v = None
         self._zonal_avg_t = None
         self._zonal_anom_t = None
+        self._zonal_avg_s = None
+        self._zonal_anom_s = None
         self._streamfunction = None
         self._oht_total = None
         self._oht_by_net = None
         self._oht_by_horizontal = None
         self._oht_by_overturning = None
+        self._oft_total = None
+        self._oft_by_net = None
+        self._oft_by_horizontal = None
+        self._oft_by_overturning = None
             
     def section_avg(self, data, total=False):
         """ Return avg across whole section """
@@ -84,6 +93,13 @@ class Transports(object):
         if self._avg_t is None:
             self._avg_t = self.section_avg(self.t)
         return self._avg_t
+    
+    @property 
+    def avg_s(self):
+        """ Return section average salinity """
+        if self._avg_s is None:
+            self._avg_s = self.section_avg(self.s)
+        return self._avg_s
     
     @property 
     def avg_v(self):
@@ -128,6 +144,13 @@ class Transports(object):
         return self._zonal_avg_t
     
     @property
+    def zonal_avg_s(self):
+        """ Return zonal mean salinity profile """
+        if self._zonal_avg_s is None:
+            self._zonal_avg_s = self.zonal_avg(self.s)
+        return self._zonal_avg_s
+    
+    @property
     def zonal_anom_v(self):
         """ Return velocity anomalies relative to zonal mean profile """
         if self._zonal_anom_v is None:
@@ -140,6 +163,13 @@ class Transports(object):
         if self._zonal_anom_t is None:
             self._zonal_anom_t = self.t - self.zonal_avg_t[:,:,np.newaxis]
         return self._zonal_anom_t
+    
+    @property
+    def zonal_anom_s(self):
+        """ Return salinity anomalies relative to zonal mean profile """
+        if self._zonal_anom_s is None:
+            self._zonal_anom_s = self.s - self.zonal_avg_s[:,:,np.newaxis]
+        return self._zonal_anom_s
     
     @property
     def zonal_sum_v(self):
@@ -184,6 +214,36 @@ class Transports(object):
             self._oht_by_overturning = (self.zonal_sum_v_no_net * self.zonal_avg_t *
                                         self.dz[np.newaxis,:]).sum(axis=1) * self.rhocp
         return self._oht_by_overturning   
+
+    @property
+    def oft_by_net(self):
+        """ Return freshwater transport by net transport through section """
+        if self._oft_by_net is None:
+            self._oft_by_net = self.net_transport * (self.avg_s - self.sref) * (-1.0/self.sref)
+        return self._oft_by_net
+    
+    @property
+    def oft_total(self):
+        """ Return total freshwater transport through section """
+        if self._oft_total is None:
+            self._oft_total =  self.section_avg(self.v * (self.s - self.sref), total=True) * (-1.0/self.sref)
+        return self._oft_total    
+    
+    @property
+    def oft_by_horizontal(self):
+        """ Return freshwater transport by horizontal circulation """
+        if self._oft_by_horizontal is None:
+            self._oft_by_horizontal = self.section_avg(self.zonal_anom_v * self.zonal_anom_s,
+                                                    total=True) * (-1.0/self.sref)            
+        return self._oft_by_horizontal   
+
+    @property
+    def oft_by_overturning(self):
+        """ Return freshwater transport by local overturning circulation """
+        if self._oft_by_overturning is None:
+            self._oft_by_overturning = (self.zonal_sum_v_no_net * self.zonal_avg_s *
+                                        self.dz[np.newaxis,:]).sum(axis=1) * (-1.0/self.sref)
+        return self._oft_by_overturning   
 
 
 def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
@@ -235,12 +295,12 @@ def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
     vrapid.data = vgeo.data + ek.data
     
     # Get volume and heat transports on each (sub-)section
-    fc_trans = Transports(vgeo, t_on_v, fcmin, fcmax)        # Florida current transports
-    wbw_trans = Transports(vgeo, t_on_v, wbwmin, wbwmax)     # Western-boundary wedge transports
-    int_trans = Transports(vgeo, t_on_v, intmin, intmax)     # Gyre interior transports
-    ek_trans = Transports(ek, t_on_v, intmin, intmax)        # Ekman transports
-    model_trans = Transports(v, t_on_v, fcmin, intmax)       # Total section transports using model velocities
-    rapid_trans = Transports(vrapid, t_on_v, fcmin, intmax)  # Total section transports using RAPID approximation
+    fc_trans = Transports(vgeo, t_on_v, s_on_v, fcmin, fcmax)        # Florida current transports
+    wbw_trans = Transports(vgeo, t_on_v, s_on_v, wbwmin, wbwmax)     # Western-boundary wedge transports
+    int_trans = Transports(vgeo, t_on_v, s_on_v, intmin, intmax)     # Gyre interior transports
+    ek_trans = Transports(ek, t_on_v, s_on_v, intmin, intmax)        # Ekman transports
+    model_trans = Transports(v, t_on_v, s_on_v, fcmin, intmax)       # Total section transports using model velocities
+    rapid_trans = Transports(vrapid, t_on_v, s_on_v, fcmin, intmax)  # Total section transports using RAPID approximation
 
     # Create netcdf object for output/plotting
     trans = output.create_netcdf(config,rapid_trans, model_trans, fc_trans, 
