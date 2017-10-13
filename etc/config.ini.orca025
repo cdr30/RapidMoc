@@ -67,9 +67,9 @@ fc_minlon = -81.0
 fc_maxlon = -78.4
 wbw_maxlon = -76.1
 int_maxlon = -10.
+ek_profile_type = linear
 
 [output]
 date_format=%Y%m
-name=ORAS5
 plot=True
 outdir=/home/rd/necr/tmp/rapidmoc/oras5/

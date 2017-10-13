@@ -67,9 +67,9 @@ fc_minlon = -81.0
 fc_maxlon = -75.5
 wbw_maxlon = -73.0
 int_maxlon = -10.
+ek_profile_type = linear
 
 [output]
 date_format=%Y
-name=gp69
 plot=True
 outdir=/home/rd/necr/tmp/rapidmoc/
