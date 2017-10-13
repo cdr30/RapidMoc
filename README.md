@@ -135,6 +135,22 @@ The RAPID-style calculation requires specification of the longitude bounds for e
 #### `plot_rapid_regions.py`
 The `plot_rapid_regions.py` is found within the `scripts` directory and is used to visualize the RAPID boundaries on top of meridional velocity data as specified within a particular `config.ini` file. Some example plots showing the tuned RAPID domains for ORCA025 and ORCA1 configurations of the NEMO ocean model are included below.
 
+```
+usage: plot_rapid_regions.py [-h] [--name NAME] configf vfile
+
+Plot meridional currents at RAPID section and region boundaries.
+
+positional arguments:
+  configf      RapidMoc config file
+  vfile        Netcdf file containing meridional velocity data
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --name NAME  Name to use on plot
+```
+
+
+
 #### Example plots showing the RAPID regions in different resolution models
 ![orca1.png](example_plots/orca1.png)
 ![orca025.png](example_plots/orca025.png)
