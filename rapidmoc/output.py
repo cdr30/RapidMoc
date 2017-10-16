@@ -95,9 +95,9 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     t_fc_fwt.maximum_longitude = fc_maxlon
     t_fc_fwt.comment = 'Florida current flow-weighted potential temperature'
     t_fc_fwt[:] = fc_trans.oht_total / (fc_trans.rhocp * fc_trans.net_transport)
-
+    
     # Basinwide salinity profile
-    s_basin = dataset.createVariable('s_basin',np.float64,(tdim.name,zdim.name))
+    s_basin = dataset.createVariable('s_basin',np.float64,(tdim._name,zdim._name))
     s_basin.units = 'PSU'
     s_basin.minimum_longitude = fc_minlon
     s_basin.maximum_longitude = int_maxlon
@@ -105,13 +105,13 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     s_basin[:] = rapid_trans.zonal_avg_s
 
     # Florida current flow-weighted salinity
-    s_fc_fwt = dataset.createVariable('s_fc_fwt',np.float64,(tdim.name))
+    s_fc_fwt = dataset.createVariable('s_fc_fwt',np.float64,(tdim._name))
     s_fc_fwt.units = 'PSU'
     s_fc_fwt.minimum_longitude = fc_minlon
     s_fc_fwt.maximum_longitude = fc_maxlon
     s_fc_fwt.comment = 'Florida current flow-weighted salinity'
     s_fc_fwt[:] = fc_trans.oft_total / ((-1.0/fc_trans.sref) * fc_trans.net_transport)
-        
+    
     # Basinwide transport profile - RAPID approx
     v_basin_rapid = dataset.createVariable('v_basin_rapid',np.float64,(tdim._name,zdim._name))
     v_basin_rapid.units = 'Sv/m'
@@ -377,7 +377,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     q_mo[:] = q_geoint[:] + q_wbw[:] + q_eddy[:]
 
     # Total freshwater transport - RAPID approx
-    fw_sum_rapid = dataset.createVariable('fw_sum_rapid',np.float64,(tdim.name))
+    fw_sum_rapid = dataset.createVariable('fw_sum_rapid',np.float64,(tdim._name))
     fw_sum_rapid.units = 'Sv'
     fw_sum_rapid.minimum_longitude = fc_minlon
     fw_sum_rapid.maximum_longitude = int_maxlon
@@ -385,7 +385,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_sum_rapid[:] = rapid_trans.oft_total /1.0e6
         
     # Gyre freshwater transport - RAPID approx
-    fw_gyre_rapid = dataset.createVariable('fw_gyre_rapid',np.float64,(tdim.name))
+    fw_gyre_rapid = dataset.createVariable('fw_gyre_rapid',np.float64,(tdim._name))
     fw_gyre_rapid.units = 'Sv'
     fw_gyre_rapid.minimum_longitude = fc_minlon
     fw_gyre_rapid.maximum_longitude = int_maxlon
@@ -393,7 +393,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_gyre_rapid[:] = rapid_trans.oft_by_horizontal/1.0e6 
     
     # Overturning freshwater transport - RAPID approx
-    fw_ot_rapid = dataset.createVariable('fw_ot_rapid',np.float64,(tdim.name))
+    fw_ot_rapid = dataset.createVariable('fw_ot_rapid',np.float64,(tdim._name))
     fw_ot_rapid.units = 'Sv'
     fw_ot_rapid.minimum_longitude = fc_minlon
     fw_ot_rapid.maximum_longitude = int_maxlon
@@ -401,7 +401,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_ot_rapid[:] = rapid_trans.oft_by_overturning /1.0e6
     
     # freshwater transport by net throughflow - RAPID approx
-    fw_net_rapid = dataset.createVariable('fw_net_rapid',np.float64,(tdim.name))
+    fw_net_rapid = dataset.createVariable('fw_net_rapid',np.float64,(tdim._name))
     fw_net_rapid.units = 'Sv'
     fw_net_rapid.minimum_longitude = fc_minlon
     fw_net_rapid.maximum_longitude = int_maxlon
@@ -409,7 +409,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_net_rapid[:] = rapid_trans.oft_by_net /1.0e6
     
     # Total freshwater transport - model v
-    fw_sum_model = dataset.createVariable('fw_sum_model',np.float64,(tdim.name))
+    fw_sum_model = dataset.createVariable('fw_sum_model',np.float64,(tdim._name))
     fw_sum_model.units = 'Sv'
     fw_sum_model.minimum_longitude = fc_minlon
     fw_sum_model.maximum_longitude = int_maxlon
@@ -417,7 +417,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_sum_model[:] = model_trans.oft_total /1.0e6
     
     # Gyre freshwater transport -model v
-    fw_gyre_model = dataset.createVariable('fw_gyre_model',np.float64,(tdim.name))
+    fw_gyre_model = dataset.createVariable('fw_gyre_model',np.float64,(tdim._name))
     fw_gyre_model.units = 'Sv'
     fw_gyre_model.minimum_longitude = fc_minlon
     fw_gyre_model.maximum_longitude = int_maxlon
@@ -425,7 +425,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_gyre_model[:] = model_trans.oft_by_horizontal /1.0e6
     
     # Overturning freshwater transport - model v
-    fw_ot_model = dataset.createVariable('fw_ot_model',np.float64,(tdim.name))
+    fw_ot_model = dataset.createVariable('fw_ot_model',np.float64,(tdim._name))
     fw_ot_model.units = 'Sv'
     fw_ot_model.minimum_longitude = fc_minlon
     fw_ot_model.maximum_longitude = int_maxlon
@@ -433,7 +433,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_ot_model[:] = model_trans.oft_by_overturning /1.0e6
     
     # freshwater transport by net throughflow - model v
-    fw_net_model = dataset.createVariable('fw_net_model',np.float64,(tdim.name))
+    fw_net_model = dataset.createVariable('fw_net_model',np.float64,(tdim._name))
     fw_net_model.units = 'Sv'
     fw_net_model.minimum_longitude = fc_minlon
     fw_net_model.maximum_longitude = int_maxlon
@@ -441,7 +441,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_net_model[:] = model_trans.oft_by_net /1.0e6
         
     # freshwater transport by florida current
-    fw_fc = dataset.createVariable('fw_fc',np.float64,(tdim.name))
+    fw_fc = dataset.createVariable('fw_fc',np.float64,(tdim._name))
     fw_fc.units = 'Sv'
     fw_fc.minimum_longitude = fc_minlon
     fw_fc.maximum_longitude = fc_maxlon
@@ -449,7 +449,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_fc[:] = fc_trans.oft_total /1.0e6
     
     # freshwater transport by ekman
-    fw_ek = dataset.createVariable('fw_ek',np.float64,(tdim.name))
+    fw_ek = dataset.createVariable('fw_ek',np.float64,(tdim._name))
     fw_ek.units = 'Sv'
     fw_ek.minimum_longitude = wbw_maxlon
     fw_ek.maximum_longitude = int_maxlon
@@ -457,7 +457,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_ek[:] = ek_trans.oft_total/1.0e6
     
     # freshwater transport by wbw
-    fw_wbw = dataset.createVariable('fw_wbw',np.float64,(tdim.name))
+    fw_wbw = dataset.createVariable('fw_wbw',np.float64,(tdim._name))
     fw_wbw.units = 'Sv'
     fw_wbw.minimum_longitude = fc_maxlon
     fw_wbw.maximum_longitude = wbw_maxlon
@@ -465,7 +465,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_wbw[:] = wbw_trans.oft_total /1.0e6
     
     # freshwater transport by zonal mean geostrophic interior
-    fw_geoint = dataset.createVariable('fw_geoint',np.float64,(tdim.name))
+    fw_geoint = dataset.createVariable('fw_geoint',np.float64,(tdim._name))
     fw_geoint.units = 'Sv'
     fw_geoint.minimum_longitude = wbw_maxlon
     fw_geoint.maximum_longitude = int_maxlon
@@ -473,7 +473,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_geoint[:] = (int_trans.oft_total - int_trans.oft_by_horizontal )/1.0e6
     
     # freshwater transport by standing "eddy" component of geostrophic interior
-    fw_eddy = dataset.createVariable('fw_eddy',np.float64,(tdim.name))
+    fw_eddy = dataset.createVariable('fw_eddy',np.float64,(tdim._name))
     fw_eddy.units = 'Sv'
     fw_eddy.minimum_longitude = wbw_maxlon
     fw_eddy.maximum_longitude = int_maxlon
@@ -481,7 +481,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_eddy[:] = (int_trans.oft_by_horizontal )/1.0e6
         
     # freshwater transport by mid ocean
-    fw_mo = dataset.createVariable('fw_mo',np.float64,(tdim.name))
+    fw_mo = dataset.createVariable('fw_mo',np.float64,(tdim._name))
     fw_mo.units = 'Sv'
     fw_mo.minimum_longitude = wbw_maxlon
     fw_mo.maximum_longitude = int_maxlon
