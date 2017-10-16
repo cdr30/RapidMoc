@@ -1,5 +1,6 @@
 """
-Module containing code to plot volume and heat transport diagnostics
+Module containing code to plot volume, heat and freshwater
+transport diagnostics
 
 """
 
@@ -317,19 +318,19 @@ def plot_volume_components(trans, basename='', name='simulated', obs_vol=None, o
     plt.close()
     
         
-def linreg_vol_vs_oht(vol,oht):
-    """ Return linear regression of volume vs heat transports """
-    if len(vol) > 1:
-        slope, intercept, r_value, p_value, std_err =  stats.linregress(vol,oht)
-        oht_model = vol * slope + intercept
-        label = '(%5.3f PW/Sv)' % slope
+def linreg(x,y,units='PW/Sv'):
+    """ Return linear regression model and plot label """
+    if len(x) > 1:
+        slope, intercept, r_value, p_value, std_err =  stats.linregress(x,y)
+        y_model = x * slope + intercept
+        label = '(%5.3f %s)' % (slope, units)
     else:
-        oht_model = None
+        y_model = None
         label = ''
 
-    return oht_model, label
+    return y_model, label
 
-        
+
 def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=None):
     """ Plot total overturning vs geometric heat transports """
     
@@ -343,9 +344,9 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
     q_gyre_model = trans.variables['q_gyre_model'][:]
     q_ot_model = trans.variables['q_ot_model'][:]
     
-    q_sum_model_lin, q_sum_model_label = linreg_vol_vs_oht(moc_model, q_sum_model)
-    q_gyre_model_lin, q_gyre_model_label = linreg_vol_vs_oht(moc_model, q_gyre_model)
-    q_ot_model_lin, q_ot_model_label = linreg_vol_vs_oht(moc_model, q_ot_model)
+    q_sum_model_lin, q_sum_model_label = linreg(moc_model, q_sum_model)
+    q_gyre_model_lin, q_gyre_model_label = linreg(moc_model, q_gyre_model)
+    q_ot_model_lin, q_ot_model_label = linreg(moc_model, q_ot_model)
     
     plt.plot(moc_model, q_sum_model,'x', color='k', label='total %s' % q_sum_model_label)
     plt.plot(moc_model, q_ot_model,'x', color=c1, label='overturning %s' % q_ot_model_label)
@@ -370,9 +371,9 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
     q_gyre_rapid = trans.variables['q_gyre_rapid'][:]
     q_ot_rapid = trans.variables['q_ot_rapid'][:]
 
-    q_sum_rapid_lin, q_sum_rapid_label = linreg_vol_vs_oht(moc_rapid, q_sum_rapid)
-    q_gyre_rapid_lin, q_gyre_rapid_label = linreg_vol_vs_oht(moc_rapid, q_gyre_rapid)
-    q_ot_rapid_lin, q_ot_rapid_label = linreg_vol_vs_oht(moc_rapid, q_ot_rapid)
+    q_sum_rapid_lin, q_sum_rapid_label = linreg(moc_rapid, q_sum_rapid)
+    q_gyre_rapid_lin, q_gyre_rapid_label = linreg(moc_rapid, q_gyre_rapid)
+    q_ot_rapid_lin, q_ot_rapid_label = linreg(moc_rapid, q_ot_rapid)
 
     plt.plot(moc_rapid, q_sum_rapid,'x', color='k', label='total %s' % q_sum_rapid_label)
     plt.plot(moc_rapid, q_ot_rapid,'x', color=c1, label='overturning %s' % q_ot_rapid_label)
@@ -401,9 +402,9 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
         q_ot_obs = obs_oht.q_ot[oht_ind]
         moc_obs = obs_vol.moc[vol_ind]
         
-        q_sum_obs_lin, q_sum_obs_label = linreg_vol_vs_oht(moc_obs, q_sum_obs)
-        q_gyre_obs_lin, q_gyre_obs_label = linreg_vol_vs_oht(moc_obs, q_gyre_obs)
-        q_ot_obs_lin, q_ot_obs_label = linreg_vol_vs_oht(moc_obs, q_ot_obs)
+        q_sum_obs_lin, q_sum_obs_label = linreg(moc_obs, q_sum_obs)
+        q_gyre_obs_lin, q_gyre_obs_label = linreg(moc_obs, q_gyre_obs)
+        q_ot_obs_lin, q_ot_obs_label = linreg(moc_obs, q_ot_obs)
         
         plt.plot(moc_obs, q_sum_obs,'x', color='k', label='total %s' % q_sum_obs_label)
         plt.plot(moc_obs, q_ot_obs,'x', color=c1, label='overturning %s' % q_ot_obs_label)
@@ -428,7 +429,7 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
 
 
 def plot_vol_vs_heat_transports(trans, basename='', name='simulated', obs_vol=None, obs_oht=None):
-    """ Plot total overturning vs geometric heat transports """
+    """ Plot volume vs heat transport for RAPID components  """
     
     # Extract model variables from data objects
     dts = utils.get_ncdates(trans)
@@ -439,9 +440,9 @@ def plot_vol_vs_heat_transports(trans, basename='', name='simulated', obs_vol=No
     q_fc = trans.variables['q_fc'][:]
     q_mo = trans.variables['q_mo'][:]
 
-    q_fc_lin, q_fc_label = linreg_vol_vs_oht(fc, q_fc)
-    q_ek_lin, q_ek_label = linreg_vol_vs_oht(ek, q_ek)
-    q_mo_lin, q_mo_label = linreg_vol_vs_oht(umo, q_mo)
+    q_fc_lin, q_fc_label = linreg(fc, q_fc)
+    q_ek_lin, q_ek_label = linreg(ek, q_ek)
+    q_mo_lin, q_mo_label = linreg(umo, q_mo)
 
     
     # Extract obs variables from data objects
@@ -456,9 +457,9 @@ def plot_vol_vs_heat_transports(trans, basename='', name='simulated', obs_vol=No
         q_fc_obs = obs_oht.q_fc[oht_ind]
         q_mo_obs = obs_oht.q_mo[oht_ind]
         
-        q_fc_obs_lin, q_fc_obs_label = linreg_vol_vs_oht(fc_obs, q_fc_obs)
-        q_ek_obs_lin, q_ek_obs_label = linreg_vol_vs_oht(ek_obs, q_ek_obs)
-        q_mo_obs_lin, q_mo_obs_label = linreg_vol_vs_oht(umo_obs, q_mo_obs)
+        q_fc_obs_lin, q_fc_obs_label = linreg(fc_obs, q_fc_obs)
+        q_ek_obs_lin, q_ek_obs_label = linreg(ek_obs, q_ek_obs)
+        q_mo_obs_lin, q_mo_obs_label = linreg(umo_obs, q_mo_obs)
     
     # Plot ekman 
     fig = plt.figure(figsize=(15,5))
@@ -677,6 +678,350 @@ def plot_rapid_heat_components(trans, basename='', name='simulated', obs=None,lw
     plt.close()
     
 
+        
+def plot_moc_vs_oft(trans, basename='', name='simulated', obs_vol=None, obs_oft=None):
+    """ Plot total overturning vs geometric freshwater transports """
+    
+    # Add model data to axis (model v)
+    fig = plt.figure(figsize=(15,5))
+    fig.add_subplot(1,3,1)
+
+    dts = utils.get_ncdates(trans)
+    moc_model = trans.variables['moc_rapid'][:]
+    fw_sum_model = trans.variables['fw_sum_model'][:]
+    fw_gyre_model = trans.variables['fw_gyre_model'][:]
+    fw_ot_model = trans.variables['fw_ot_model'][:]
+    
+    fw_sum_model_lin, fw_sum_model_label = linreg(moc_model, fw_sum_model, units='Sv/Sv')
+    fw_gyre_model_lin, fw_gyre_model_label = linreg(moc_model, fw_gyre_model, units='Sv/Sv')
+    fw_ot_model_lin, fw_ot_model_label = linreg(moc_model, fw_ot_model, units='Sv/Sv')
+    
+    plt.plot(moc_model, fw_sum_model,'x', color='k', label='total %s' % fw_sum_model_label)
+    plt.plot(moc_model, fw_ot_model,'x', color=c1, label='overturning %s' % fw_ot_model_label)
+    plt.plot(moc_model, fw_gyre_model,'x', color=c2, label='gyre %s' % fw_gyre_model_label)
+
+    if fw_sum_model_lin is not None:
+        plt.plot(moc_model, fw_sum_model_lin,'-', color='k')
+        plt.plot(moc_model, fw_ot_model_lin,'-', color=c1)
+        plt.plot(moc_model, fw_gyre_model_lin,'-', color=c2)
+    
+    plt.xlabel('MOC (Sv)')
+    plt.ylabel('Equivalent freshwater transport (Sv)')
+    plt.title('MOC vs FWT in %s (model velocities)' % name)
+    plt.legend(loc='best', fontsize=8, )
+
+    # Add model data to axis (RAPID approx)
+    fig.add_subplot(1,3,2)
+    
+    moc_rapid = trans.variables['moc_rapid'][:]
+    fw_sum_rapid = trans.variables['fw_sum_rapid'][:]
+    fw_gyre_rapid = trans.variables['fw_gyre_rapid'][:]
+    fw_ot_rapid = trans.variables['fw_ot_rapid'][:]
+
+    fw_sum_rapid_lin, fw_sum_rapid_label = linreg(moc_rapid, fw_sum_rapid, units='Sv/Sv')
+    fw_gyre_rapid_lin, fw_gyre_rapid_label = linreg(moc_rapid, fw_gyre_rapid, units='Sv/Sv')
+    fw_ot_rapid_lin, fw_ot_rapid_label = linreg(moc_rapid, fw_ot_rapid, units='Sv/Sv')
+
+    plt.plot(moc_rapid, fw_sum_rapid,'x', color='k', label='total %s' % fw_sum_rapid_label)
+    plt.plot(moc_rapid, fw_ot_rapid,'x', color=c1, label='overturning %s' % fw_ot_rapid_label)
+    plt.plot(moc_rapid, fw_gyre_rapid,'x', color=c2, label='gyre %s' % fw_gyre_rapid_label)
+
+    if fw_sum_rapid_lin is not None:
+        plt.plot(moc_rapid, fw_sum_rapid_lin,'-', color='k')
+        plt.plot(moc_rapid, fw_ot_rapid_lin,'-', color=c1)
+        plt.plot(moc_rapid, fw_gyre_rapid_lin,'-', color=c2)
+
+    plt.xlabel('MOC (Sv)')
+    plt.ylabel('Equivalent freshwater transport (Sv)')
+    plt.title('MOC vs OFT in %s (RAPID approx)' % name)
+    plt.legend(loc='best', fontsize=8, )
+
+
+    # Add optional obs data to axis
+    if (obs_oft is not None) and (obs_vol is not None):
+        fig.add_subplot(1,3,3)
+
+        mindt, maxdt = utils.get_daterange(obs_vol.dates, obs_oft.dates)
+        vol_ind = utils.get_dateind(obs_vol.dates, mindt, maxdt)
+        oft_ind = utils.get_dateind(obs_oft.dates, mindt, maxdt)
+        fw_sum_obs = obs_oft.fw_sum[oft_ind]
+        fw_gyre_obs = obs_oft.fw_gyre[oft_ind]
+        fw_ot_obs = obs_oft.fw_ot[oft_ind]
+        moc_obs = obs_vol.moc[vol_ind]
+        
+        fw_sum_obs_lin, fw_sum_obs_label = linreg(moc_obs, fw_sum_obs, units='Sv/Sv')
+        fw_gyre_obs_lin, fw_gyre_obs_label = linreg(moc_obs, fw_gyre_obs, units='Sv/Sv')
+        fw_ot_obs_lin, fw_ot_obs_label = linreg(moc_obs, fw_ot_obs, units='Sv/Sv')
+        
+        plt.plot(moc_obs, fw_sum_obs,'x', color='k', label='total %s' % fw_sum_obs_label)
+        plt.plot(moc_obs, fw_ot_obs,'x', color=c1, label='overturning %s' % fw_ot_obs_label)
+        plt.plot(moc_obs, fw_gyre_obs,'x', color=c2, label='gyre %s' % fw_gyre_obs_label)
+        
+        if fw_sum_obs_lin is not None:
+            plt.plot(moc_obs, fw_sum_obs_lin,'-', color='k')       
+            plt.plot(moc_obs, fw_ot_obs_lin,'-', color=c1)
+            plt.plot(moc_obs, fw_gyre_obs_lin,'-', color=c2)
+
+        plt.xlabel('MOC (Sv)')
+        plt.ylabel('Equivalent freshwater transport (Sv)')
+        plt.title('MOC vs OFT in RAPID observations')
+        plt.legend(loc='best', fontsize=8, )
+
+    # Save plot
+    plt.tight_layout()
+    savef = basename + 'moc_vs_freshwater_transports_at_26n.png'
+    print 'SAVING: %s' % savef
+    fig.savefig(savef, resolution=300)
+    plt.close()
+
+
+
+def plot_vol_vs_fw_transports(trans, basename='', name='simulated', obs_vol=None, obs_oft=None):
+    """ Plot volume vs freshwater transport for RAPID components  """
+    
+    # Extract model variables from data objects
+    dts = utils.get_ncdates(trans)
+    fc = trans.variables['fc'][:]
+    ek = trans.variables['ekman'][:]
+    umo = trans.variables['umo'][:]
+    fw_ek = trans.variables['fw_ek'][:]
+    fw_fc = trans.variables['fw_fc'][:]
+    fw_mo = trans.variables['fw_mo'][:]
+
+    fw_fc_lin, fw_fc_label = linreg(fc, fw_fc, units='Sv/Sv')
+    fw_ek_lin, fw_ek_label = linreg(ek, fw_ek, units='Sv/Sv')
+    fw_mo_lin, fw_mo_label = linreg(umo, fw_mo, units='Sv/Sv')
+
+    
+    # Extract obs variables from data objects
+    if (obs_vol is not None) and (obs_oft is not None):
+        mindt, maxdt = utils.get_daterange(obs_vol.dates, obs_oft.dates)
+        vol_ind = utils.get_dateind(obs_vol.dates, mindt, maxdt)
+        oft_ind = utils.get_dateind(obs_oft.dates, mindt, maxdt)
+        ek_obs = obs_vol.ekman[vol_ind]
+        fc_obs = obs_vol.fc[vol_ind]
+        umo_obs = obs_vol.umo[vol_ind]
+        fw_ek_obs = obs_oft.fw_ek[oft_ind]
+        fw_fc_obs = obs_oft.fw_fc[oft_ind]
+        fw_mo_obs = obs_oft.fw_mo[oft_ind]
+        
+        fw_fc_obs_lin, fw_fc_obs_label = linreg(fc_obs, fw_fc_obs, units='Sv/Sv')
+        fw_ek_obs_lin, fw_ek_obs_label = linreg(ek_obs, fw_ek_obs, units='Sv/Sv')
+        fw_mo_obs_lin, fw_mo_obs_label = linreg(umo_obs, fw_mo_obs, units='Sv/Sv')
+    
+    # Plot ekman 
+    fig = plt.figure(figsize=(15,5))
+    fig.add_subplot(1,3,1)
+
+    plt.plot(ek, fw_ek,'x', color=c1, label='%s %s' % (name, fw_ek_label))
+    if fw_ek_lin is not None:
+        plt.plot(ek, fw_ek_lin,'-', color=c1)
+   
+    if (obs_vol is not None) and (obs_oft is not None):
+        plt.plot(ek_obs, fw_ek_obs,'x', color='k', label='RAPID observations %s' % fw_ek_obs_label)
+        if fw_ek_obs_lin is not None:
+            plt.plot(ek_obs, fw_ek_obs_lin,'-', color='k')
+        
+    plt.xlabel('Volume transport (Sv)')
+    plt.ylabel('Equivalent freshwater transport (Sv)')
+    plt.title('Ekman volume vs freshwater transport')
+    plt.legend(loc='best', fontsize=8)
+    
+    # Plot florida current 
+    fig.add_subplot(1,3,2)
+
+    plt.plot(fc, fw_fc,'x', color=c1, label='%s %s' % (name, fw_fc_label))
+    if fw_fc_lin is not None:
+        plt.plot(fc, fw_fc_lin,'-', color=c1)
+
+    if (obs_vol is not None) and (obs_oft is not None):
+        plt.plot(fc_obs, fw_fc_obs,'x', color='k', label='RAPID observations %s' % fw_fc_obs_label)
+        if fw_fc_obs_lin is not None:
+            plt.plot(fc_obs, fw_fc_obs_lin,'-', color='k')
+   
+    plt.xlabel('Volume transport (Sv)')
+    plt.ylabel('Equivalent freshwater transport (Sv)')
+    plt.title('Florida Current volume vs freshwater transport')
+    plt.legend(loc='best', fontsize=8)
+    
+    # Plot mid-ocean 
+    fig.add_subplot(1,3,3)
+    
+    plt.plot(umo, fw_mo,'x', color=c1, label='%s %s' % (name, fw_mo_label))
+    if fw_mo_lin is not None:
+        plt.plot(umo, fw_mo_lin,'-', color=c1)
+   
+    if (obs_vol is not None) and (obs_oft is not None):
+        plt.plot(umo_obs, fw_mo_obs,'x', color='k', label='RAPID observations %s' % fw_mo_obs_label)
+        if fw_mo_obs_lin is not None:
+            plt.plot(umo_obs, fw_mo_obs_lin,'-', color='k')
+
+    plt.xlabel('Volume transport (Sv)')
+    plt.ylabel('Equivalent freshwater transport (Sv)')
+    plt.title('Mid-ocean volume vs freshwater transport')
+    plt.legend(loc='best', fontsize=8)
+
+    # Save plot
+    plt.tight_layout()
+    savef = basename + 'volume_vs_freshwater_transports_at_26n.png'
+    print 'SAVING: %s' % savef
+    fig.savefig(savef, resolution=300)
+    plt.close()
+
+
+def plot_geometric_fw_components(trans, basename='', name='simulated', obs=None,lw=4):
+    """ Plot geometric freshwater transport components """
+      
+    # Add model data to sub-axis (model v)
+    fig = plt.figure(figsize=(8,12))
+    fig.add_subplot(3,1,1)
+
+    dts = utils.get_ncdates(trans)
+    fw_sum_model = trans.variables['fw_sum_model'][:]
+    fw_gyre_model = trans.variables['fw_gyre_model'][:]
+    fw_ot_model = trans.variables['fw_ot_model'][:]
+    fw_net_model = trans.variables['fw_net_model'][:]
+
+    fw_sum_model_label = 'Total  (%4.2f Sv)' % (fw_sum_model.mean())
+    fw_gyre_model_label = 'Gyre (%4.2f Sv)' % (fw_gyre_model.mean())
+    fw_ot_model_label = 'Overturning  (%4.2f Sv)' % (fw_ot_model.mean())
+    fw_net_model_label = 'Net (%4.2f Sv)' % (fw_net_model.mean())
+    
+    plt.plot(dts, fw_sum_model, linewidth=lw, color='k', label=fw_sum_model_label)
+    plt.plot(dts, fw_ot_model, linewidth=lw, color=c1, label=fw_ot_model_label)
+    plt.plot(dts, fw_gyre_model, linewidth=lw, color=c2, label=fw_gyre_model_label)
+    plt.plot(dts, fw_net_model, linewidth=lw, color=c3, label=fw_net_model_label)
+
+    plt.xlabel('Date')
+    plt.ylabel('Sv')
+    plt.title('Equivalent FW transports at 26N in %s (model velocities)'  % name)
+    plt.legend(loc=8, fontsize=8, ncol=2)
+
+
+    # Add model data to sub-axis (RAPID approx)
+    fig.add_subplot(3,1,2)
+       
+    fw_sum_rapid = trans.variables['fw_sum_rapid'][:]
+    fw_gyre_rapid = trans.variables['fw_gyre_rapid'][:]
+    fw_ot_rapid = trans.variables['fw_ot_rapid'][:]
+    fw_net_rapid = trans.variables['fw_net_rapid'][:]
+    
+    fw_sum_rapid_label = 'Total (%4.2f Sv)' % (fw_sum_rapid.mean())
+    fw_gyre_rapid_label = 'Gyre (%4.2f Sv)' % (fw_gyre_rapid.mean())
+    fw_ot_rapid_label = 'Overturning (%4.2f Sv)' % (fw_ot_rapid.mean())
+    fw_net_rapid_label = 'Net (%4.2f Sv)' % (fw_net_rapid.mean())
+
+    plt.plot(dts, fw_sum_rapid, linewidth=lw, color='k', label=fw_sum_rapid_label)
+    plt.plot(dts, fw_ot_rapid, linewidth=lw, color=c1, label=fw_ot_rapid_label)
+    plt.plot(dts, fw_gyre_rapid, linewidth=lw, color=c2, label=fw_gyre_rapid_label)
+    plt.plot(dts, fw_net_rapid, linewidth=lw, color=c3, label=fw_net_rapid_label)
+        
+    plt.xlabel('Date')
+    plt.ylabel('Sv')
+    plt.title('Equivalent FW transports at 26N in %s (RAPID approx)'  % name)
+    plt.legend(loc=8, fontsize=8, ncol=2)
+
+
+    # Add optional observational data to sub-axis
+    if obs is not None:
+        fig.add_subplot(3,1,3)
+        fw_sum_obs_label = 'Total (%4.2f Sv)' % (obs.fw_sum.mean())
+        fw_gyre_obs_label = 'Gyre (%4.2f Sv)' % (obs.fw_gyre.mean())
+        fw_ot_obs_label = 'Overturning (%4.2f Sv)' % (obs.fw_ot.mean())
+        
+        plt.plot(obs.dates, obs.fw_sum, linewidth=lw, color='k',
+                 label=fw_sum_obs_label)
+        plt.plot(obs.dates, obs.fw_ot, linewidth=lw, color=c1, 
+                 label=fw_ot_obs_label)
+        plt.plot(obs.dates, obs.fw_gyre, linewidth=lw, color=c2, 
+                 label=fw_gyre_obs_label)
+    
+        plt.xlabel('Date')
+        plt.ylim([-2.,1.0])
+        plt.ylabel('Sv')
+        plt.title('Equivalent FW transports transports at 26N in RAPID observations')
+        plt.legend(loc=8, fontsize=8, ncol=2)
+   
+
+    # Save plot
+    plt.tight_layout()
+    savef = basename + 'fw_transports_geometric_decomposition_at_26n.png'
+    print 'SAVING: %s' % savef
+    fig.savefig(savef, resolution=300)
+    plt.close()
+    
+
+def plot_rapid_fw_components(trans, basename='', name='simulated', obs=None,lw=4):
+    """ Plot RAPID fw transport components """
+    
+    # Add model data to sub-axis
+    fig = plt.figure(figsize=(8,12))
+    fig.add_subplot(2,1,1)
+
+    dts = utils.get_ncdates(trans)
+    fw_sum = trans.variables['fw_sum_rapid'][:]
+    fw_ek = trans.variables['fw_ek'][:]
+    fw_fc = trans.variables['fw_fc'][:]
+    fw_geoint = trans.variables['fw_geoint'][:]
+    fw_eddy = trans.variables['fw_eddy'][:]
+    fw_wbw = trans.variables['fw_wbw'][:]
+
+    fw_sum_label = 'Total (%4.2f Sv)' % (fw_sum.mean())
+    fw_ek_label = 'Ekman (%4.2f Sv)' % (fw_ek.mean())
+    fw_fc_label = 'Florida current (%4.2f Sv)' % (fw_fc.mean())
+    fw_geoint_label = 'Geostrophic interior (%4.2f Sv)' % (fw_geoint.mean())
+    fw_wbw_label = 'WBW (%4.2fSv)' % (fw_wbw.mean())
+    fw_eddy_label = 'Eddies (%4.2f Sv)' % (fw_eddy.mean())
+
+    plt.plot(dts, fw_sum, linewidth=lw, color='k', label=fw_sum_label)
+    plt.plot(dts, fw_ek, linewidth=lw, color=c1, label=fw_ek_label)
+    plt.plot(dts, fw_fc, linewidth=lw, color=c2, label=fw_fc_label)
+    plt.plot(dts, fw_wbw, linewidth=lw, color=c3, label=fw_wbw_label)
+    plt.plot(dts, fw_geoint, linewidth=lw, color=c4, label=fw_geoint_label)
+    plt.plot(dts, fw_eddy, linewidth=lw, color='0.5', label=fw_eddy_label)
+    plt.xlabel('Date')
+    plt.ylabel('Sv')
+    plt.title('Equivalent FW transports at 26N in %s'  % name)
+    plt.legend(loc=8, fontsize=8, ncol=2)
+
+
+    # Add observational data to sub-axis
+    if obs is not None:
+        fig.add_subplot(2,1,2)
+    
+        fw_sum_obs_label = 'Total (%4.2f Sv)' % (obs.fw_sum.mean())
+        fw_ek_obs_label = 'Ekman (%4.2f Sv)' % (obs.fw_ek.mean())
+        fw_fc_obs_label = 'Florida current (%4.2f Sv)' % (obs.fw_fc.mean())
+        fw_geoint_obs_label = 'Geostrophic interior (%4.2f Sv)' % (obs.fw_geoint.mean())
+        fw_wbw_obs_label = 'WBW (%4.2f Sv)' % (obs.fw_wbw.mean())
+        fw_eddy_obs_label = 'Eddies (%4.2f Sv)' % (obs.fw_eddy.mean())
+    
+        plt.plot(obs.dates, obs.fw_sum, linewidth=lw, color='k',
+                 label=fw_sum_obs_label)
+        plt.plot(obs.dates, obs.fw_ek, linewidth=lw, color=c1, 
+                 label=fw_ek_obs_label)
+        plt.plot(obs.dates, obs.fw_fc, linewidth=lw, color=c2, 
+                 label=fw_fc_obs_label)
+        plt.plot(obs.dates, obs.fw_wbw, linewidth=lw, color=c3, 
+                 label=fw_wbw_obs_label)
+        plt.plot(obs.dates, obs.fw_geoint, linewidth=lw, color=c4,
+                 label=fw_geoint_obs_label)
+        plt.plot(obs.dates, obs.fw_eddy, linewidth=lw, color='0.5', 
+                 label=fw_eddy_obs_label)
+
+        plt.xlabel('Date')
+        plt.ylabel('Sv')
+        plt.title('Equivalent FW transports at 26N in RAPID observations')
+        plt.legend(loc=8, fontsize=8, ncol=2)
+     
+    # Save plot
+    plt.tight_layout()
+    savef = basename + 'fw_transports_rapid_decomposition_at_26n.png'
+    print 'SAVING: %s' % savef
+    fig.savefig(savef, resolution=300)
+    plt.close()
+
+
 def plot_diagnostics(trans, name='simulated', outdir='./', date_format='%Y%m%d',
                      obs_vol=None, obs_oht=None, obs_sf=None, obs_fc=None,lw=4):
     """ Plot volume and heat transport diagnostics against RAPID observations """
@@ -696,5 +1041,8 @@ def plot_diagnostics(trans, name='simulated', outdir='./', date_format='%Y%m%d',
     plot_fc_transport_profile(trans, basename=basename, name=name, obs=obs_oht,lw=lw)
     plot_moc_vs_oht(trans, basename=basename, name=name, obs_vol=obs_vol, obs_oht=obs_oht)
     plot_vol_vs_heat_transports(trans, basename=basename, name=name, obs_vol=obs_vol, obs_oht=obs_oht)
-
-
+    plot_moc_vs_oft(trans, basename=basename, name=name, obs_vol=None, obs_oft=None)
+    plot_vol_vs_fw_transports(trans, basename=basename, name=name, obs_vol=None, obs_oft=None)
+    plot_geometric_fw_components(trans, basename=basename, name=name, obs=None,lw=lw)
+    plot_rapid_fw_components(trans, basename=basename, name=name, obs=None,lw=lw)
+    
