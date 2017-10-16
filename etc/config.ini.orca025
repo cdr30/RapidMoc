@@ -68,6 +68,7 @@ fc_maxlon = -78.4
 wbw_maxlon = -76.1
 int_maxlon = -10.
 ek_profile_type = linear
+salinity_reference = 35.17
 
 [output]
 date_format=%Y%m

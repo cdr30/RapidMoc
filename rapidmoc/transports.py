@@ -15,12 +15,11 @@ G = 9.81          # Gravitational acceleration (m/s2)
 ROT = 7.292116E-5 # Rotation rate of earth (rad/s) 
 RHO_REF = 1025.   # Reference density for sea water (kg/m3)
 CP = 3985         # Specific heat capacity of sea water (J/kg/K)
-SREF = 35.17      # Mean salinity for the section (PSU)
     
 class Transports(object):
     """ Class to interface with volume and heat transport diagnostics """
     
-    def __init__(self, v, t_on_v,s_on_v,minind,maxind):
+    def __init__(self, v, t_on_v,s_on_v,minind,maxind, sref=35.17):
         """ Initialize with velocity and temperature sections """
         
         # Initialize data
@@ -29,7 +28,7 @@ class Transports(object):
         self.t = t_on_v.data[:,:,minind:maxind]
 	self.s = s_on_v.data[:,:,minind:maxind]
         self.rhocp = RHO_REF * CP
-	self.sref = SREF
+	self.sref = sref
         self.x = v.x[minind:maxind]        
         self.y = v.y[minind:maxind]
         self.z = v.z
@@ -258,6 +257,9 @@ def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
     wbw_maxlon = config.getfloat('options','wbw_maxlon') # Longitude of WBW/gyre boundary
     int_maxlon = config.getfloat('options','int_maxlon') # Maximum longitude of gyre interior
     
+    # Get salinity reference used for freshwater transports
+    sref = config.getfloat('options','reference_salinity') 
+
     # Get indices for sub-sections 
     fcmin, fcmax = utils.get_indrange(v.x, fc_minlon, fc_maxlon)     # Florida current
     wbwmin, wbwmax = utils.get_indrange(v.x, fc_maxlon, wbw_maxlon)  # WBW
@@ -295,12 +297,12 @@ def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
     vrapid.data = vgeo.data + ek.data
     
     # Get volume and heat transports on each (sub-)section
-    fc_trans = Transports(vgeo, t_on_v, s_on_v, fcmin, fcmax)        # Florida current transports
-    wbw_trans = Transports(vgeo, t_on_v, s_on_v, wbwmin, wbwmax)     # Western-boundary wedge transports
-    int_trans = Transports(vgeo, t_on_v, s_on_v, intmin, intmax)     # Gyre interior transports
-    ek_trans = Transports(ek, t_on_v, s_on_v, intmin, intmax)        # Ekman transports
-    model_trans = Transports(v, t_on_v, s_on_v, fcmin, intmax)       # Total section transports using model velocities
-    rapid_trans = Transports(vrapid, t_on_v, s_on_v, fcmin, intmax)  # Total section transports using RAPID approximation
+    fc_trans = Transports(vgeo, t_on_v, s_on_v, fcmin, fcmax, sref=sref)       # Florida current transports
+    wbw_trans = Transports(vgeo, t_on_v, s_on_v, wbwmin, wbwmax, sref=sref)    # Western-boundary wedge transports
+    int_trans = Transports(vgeo, t_on_v, s_on_v, intmin, intmax, sref=sref)    # Gyre interior transports
+    ek_trans = Transports(ek, t_on_v, s_on_v, intmin, intmax, sref=sref)       # Ekman transports
+    model_trans = Transports(v, t_on_v, s_on_v, fcmin, intmax, sref=sref)      # Total section transports using model velocities
+    rapid_trans = Transports(vrapid, t_on_v, s_on_v, fcmin, intmax, sref=sref) # Total section transports using RAPID approximation
 
     # Create netcdf object for output/plotting
     trans = output.create_netcdf(config,rapid_trans, model_trans, fc_trans, 

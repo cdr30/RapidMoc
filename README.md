@@ -188,6 +188,7 @@ fc_minlon = longitude corresponding to western boundary of simulated florida cur
 fc_maxlon = longitude corresponding to boundary between simulated florida current and the western boundary wedge containing the simulated deep western boundary current [float, -180 to 180]
 wbw_maxlon = longitude corresponding to boundary between the western boundary wedge containing the simulated deep western boundary current and the geostrophic interior [float, -180 to 180]
 int_maxlon = longitude corresponding to eastern boundary of geostrophic interior [float, -180 to 180]
+reference_salinity = reference salinity used in calculation of equivalent freshwater transports.
 
 [output]
 date_format = format string used with datetime.strftime, e.g. '%Y%m%d' [string]

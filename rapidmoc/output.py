@@ -380,7 +380,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_sum_rapid.units = 'Sv'
     fw_sum_rapid.minimum_longitude = fc_minlon
     fw_sum_rapid.maximum_longitude = int_maxlon
-    fw_sum_rapid.comment = 'Total freshwater transport across section calculated using RAPID approximations (fw_sum_rapid = fw_fc + fw_ek + fw_mo = fw_ot_rapid + fw_gyre_rapid + fw_net_rapid)'
+    fw_sum_rapid.reference_salinity = rapid_trans.sref
+    fw_sum_rapid.comment = 'Total equivalent freshwater transport across section calculated using RAPID approximations (fw_sum_rapid = fw_fc + fw_ek + fw_mo = fw_ot_rapid + fw_gyre_rapid + fw_net_rapid)'
     fw_sum_rapid[:] = rapid_trans.oft_total /1.0e6
         
     # Gyre freshwater transport - RAPID approx
@@ -404,7 +405,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_net_rapid.units = 'Sv'
     fw_net_rapid.minimum_longitude = fc_minlon
     fw_net_rapid.maximum_longitude = int_maxlon
-    fw_net_rapid.comment = 'freshwater transport referenced to 0 PSU by the net flow through the section using RAPID approximations'
+    fw_net_rapid.reference_salinity = rapid_trans.sref
+    fw_net_rapid.comment = 'equivalent freshwater transport by the net flow through the section using RAPID approximations'
     fw_net_rapid[:] = rapid_trans.oft_by_net /1.0e6
     
     # Total freshwater transport - model v
@@ -412,6 +414,7 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_sum_model.units = 'Sv'
     fw_sum_model.minimum_longitude = fc_minlon
     fw_sum_model.maximum_longitude = int_maxlon
+    fw_sum_model.reference_salinity = model_trans.sref
     fw_sum_model.comment = 'Total freshwater transport across section calculated using model velocities (fw_sum_model = fw_gyre_model + fw_ot_model + fw_net_model)'
     fw_sum_model[:] = model_trans.oft_total /1.0e6
     
@@ -436,7 +439,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_net_model.units = 'Sv'
     fw_net_model.minimum_longitude = fc_minlon
     fw_net_model.maximum_longitude = int_maxlon
-    fw_net_model.comment = 'freshwater transport referenced to 0 PSU by the net flow through the section using model velocities'
+    fw_net_model.reference_salinity = model_trans.sref
+    fw_net_model.comment = 'equivalent freshwater transport by the net flow through the section using model velocities'
     fw_net_model[:] = model_trans.oft_by_net /1.0e6
         
     # freshwater transport by florida current
@@ -444,7 +448,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_fc.units = 'Sv'
     fw_fc.minimum_longitude = fc_minlon
     fw_fc.maximum_longitude = fc_maxlon
-    fw_fc.comment = 'freshwater transport referenced to 0 PSU by the Florida current'
+    fw_fc.reference_salinity = fc_trans.sref
+    fw_fc.comment = 'equivalent freshwater transport by the Florida current'
     fw_fc[:] = fc_trans.oft_total /1.0e6
     
     # freshwater transport by ekman
@@ -452,7 +457,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_ek.units = 'Sv'
     fw_ek.minimum_longitude = wbw_maxlon
     fw_ek.maximum_longitude = int_maxlon
-    fw_ek.comment = 'freshwater transport referenced to 0C by Ekman transport'
+    fw_ek.reference_salinity = ek_trans.sref
+    fw_ek.comment = 'equivalent freshwater transport by Ekman transport'
     fw_ek[:] = ek_trans.oft_total/1.0e6
     
     # freshwater transport by wbw
@@ -460,7 +466,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_wbw.units = 'Sv'
     fw_wbw.minimum_longitude = fc_maxlon
     fw_wbw.maximum_longitude = wbw_maxlon
-    fw_wbw.comment = 'freshwater transport referenced to 0 PSU by western boundary wedge transport'
+    fw_wbw.reference_salinity = wbw_trans.sref
+    fw_wbw.comment = 'equivalent freshwater transport by western boundary wedge transport'
     fw_wbw[:] = wbw_trans.oft_total /1.0e6
     
     # freshwater transport by zonal mean geostrophic interior
@@ -468,7 +475,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_geoint.units = 'Sv'
     fw_geoint.minimum_longitude = wbw_maxlon
     fw_geoint.maximum_longitude = int_maxlon
-    fw_geoint.comment = 'freshwater transport referenced to 0 PSU by zonal mean of geostrophic interior transport'
+    fw_geoint.reference_salinity = int_trans.sref
+    fw_geoint.comment = 'equivalent freshwater transport by zonal mean of geostrophic interior transport'
     fw_geoint[:] = (int_trans.oft_total - int_trans.oft_by_horizontal )/1.0e6
     
     # freshwater transport by standing "eddy" component of geostrophic interior
@@ -476,7 +484,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_eddy.units = 'Sv'
     fw_eddy.minimum_longitude = wbw_maxlon
     fw_eddy.maximum_longitude = int_maxlon
-    fw_eddy.comment = 'freshwater transport referenced to 0 PSU by standing eddy component of geostrophic interior transport'
+    fw_eddy.reference_salinity = int_trans.sref
+    fw_eddy.comment = 'equivalent freshwater transport by standing eddy component of geostrophic interior transport'
     fw_eddy[:] = (int_trans.oft_by_horizontal )/1.0e6
         
     # freshwater transport by mid ocean
@@ -484,7 +493,8 @@ def create_netcdf(config, rapid_trans, model_trans, fc_trans,
     fw_mo.units = 'Sv'
     fw_mo.minimum_longitude = wbw_maxlon
     fw_mo.maximum_longitude = int_maxlon
-    fw_mo.comment = 'freshwater transport referenced to 0 PSU by mid-ocean transport (fw_mo = fw_geoint + fw_wbw + fw_eddy)'
+    fw_mo.reference_salinity = int_trans.sref
+    fw_mo.comment = 'equivalent freshwater transport by mid-ocean transport (fw_mo = fw_geoint + fw_wbw + fw_eddy)'
     fw_mo[:] = fw_geoint[:] + fw_wbw[:] + fw_eddy[:]
 
     return dataset
