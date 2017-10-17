@@ -9,7 +9,6 @@ import copy
 import output
 import utils
 
-
 # Constants
 G = 9.81          # Gravitational acceleration (m/s2)
 ROT = 7.292116E-5 # Rotation rate of earth (rad/s) 
@@ -307,7 +306,7 @@ def calc_transports_from_sections(config, v, tau, t_on_v, s_on_v):
     # Create netcdf object for output/plotting
     trans = output.create_netcdf(config,rapid_trans, model_trans, fc_trans, 
                                  wbw_trans, int_trans, ek_trans)
-    
+
     return trans
     
 
@@ -393,7 +392,7 @@ def calc_ek(v, tau, minlon, maxlon, ek_level, profile='uniform'):
 
     # Copy velocity data structure
     ek = copy.deepcopy(v)
-    ek.data = np.zeros_like(v.data)
+    ek.data.data[:] = 0.0
     
     # Get indices for gyre interior
     intmin, intmax = utils.get_indrange(tau.x, minlon, maxlon)
@@ -422,6 +421,7 @@ def calc_ek(v, tau, minlon, maxlon, ek_level, profile='uniform'):
         zmax = dzprof.sum()
         vek = get_linear_profiles(ek_trans, zprof, dzprof, zmax) / dx[np.newaxis].sum(axis=2)
         ek.data[:,ek_minind:ek_maxind,intmin:intmax] = vek[:,:,np.newaxis]
+        ek.data = np.ma.MaskedArray(ek.data, mask=v.mask)
     else:
         raise ValueError('Unrecognized ekman profile type')
 
