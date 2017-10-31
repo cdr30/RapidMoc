@@ -106,7 +106,7 @@ from netCDF4 import Dataset
 import rapidmoc.observations as rapidobs
 import rapidmoc.plotdiag as rapidplot
 
-obs_oht = rapidobs.HeatTransportObs(obs_oht_f, time_avg=time_avg)
+obs_oht = rapidobs.HeatTransportObs(obs_oht_f, time_avg=time_avg, mindt=mindt, maxdt=maxdt)
 obs_fc = rapidobs.FloridaCurrentObs(obs_fc_f, time_avg=time_avg)
 obs_sf = rapidobs.StreamFunctionObs(obs_sf_f, time_avg=time_avg)
 obs_vol = rapidobs.VolumeTransportObs(obs_vol_f, time_avg=time_avg)
@@ -118,7 +118,12 @@ rapidplot.plot_diagnostics(trans, name='simulated', basename='',
 
 ```
 
-Example plots are included at the end of this document.
+Example plots are included at the end of this document. Time-averaged observations can also be written to netcdf for later analysis.
+
+```
+obs.write_to_netcdf(netcdf_file_name)
+
+```
 
 ## Configuration files
 In order to run RapidMoc, it is necessary to provide a `config.ini` that describes the ocean model data format and specifies options for the RapidMoc calculation. Several example `config.ini` files are provided within the  `etc/` directory. 
