@@ -2,9 +2,13 @@
 This package calculates volume, heat, and freshwater transport diagnostics of the Atlantic meridional overturning circulation (AMOC) using output from ocean general circulation models (including those with curvilinear grids) and plots comparison with observed data from the RAPID-MOCHA array at 26N. Observational data and further details about the RAPID-MOCHA array can be found [here](http://www.rapid.ac.uk/) and [here](https://www.rsmas.miami.edu/users/mocha/mocha_results.htm).
 
 ## How to acknowledge this code
-If you use RapidMoc in analysis for a journal article, please cite [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full), which includes a full description of the methodology.
+If you use RapidMoc in analysis for a journal article, please cite the associated digital object identifier and [Roberts et al. (2013)](http://onlinelibrary.wiley.com/doi/10.1002/grl.50930/full), which includes a full description of the methodology.
 
-*Full citation*: Roberts, C. D., et al. (2013), Atmosphere drives recent interannual variability of the Atlantic meridional overturning circulation at 26.5°N, Geophys. Res. Lett., 40, 5164–5170 doi:10.1002/grl.50930.
+[![DOI](https://zenodo.org/badge/76538345.svg)](https://zenodo.org/badge/latestdoi/76538345)
+
+*Citation for code:* Roberts, C.D., 2017: cdr30/RapidMoc: RapidMoc v1.0.1. doi:10.5281/zenodo.1036387.
+
+*Citation for method:* Roberts, C. D., et al. (2013), Atmosphere drives recent interannual variability of the Atlantic meridional overturning circulation at 26.5°N, Geophys. Res. Lett., 40, 5164–5170 doi:10.1002/grl.50930.
 
 
 ## Methods and motivation
