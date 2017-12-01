@@ -56,13 +56,13 @@ def create_netcdf(savef, dts, dat):
 
     # Create time coordinate
     tdim = dataset.createDimension('time', None)
-    time = dataset.createVariable('time',np.float64,(tdim.name,))
+    time = dataset.createVariable('time',np.float64,(tdim._name,))
     time.units = 'hours since 0001-01-01 00:00:00.0'
     time.calendar = 'gregorian'
     time[:] = date2num(dts, time.units, calendar=time.calendar)
 
     # Create data variable
-    fc = dataset.createVariable('florida_current_transport',np.float64,(tdim.name),fill_value=1.e20)
+    fc = dataset.createVariable('florida_current_transport',np.float64,(tdim._name),fill_value=1.e20)
     fc.units = 'Sv'
     fc[:] = dat
     

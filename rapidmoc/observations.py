@@ -152,18 +152,18 @@ class StreamFunctionObs(TransportObs):
         tdim = dataset.createDimension('time', None)
         
         # Create time coordinate
-        time = dataset.createVariable('time',np.float64,(tdim.name,))
+        time = dataset.createVariable('time',np.float64,(tdim._name,))
         time.units = 'hours since 0001-01-01 00:00:00.0'
         time.calendar = 'gregorian'
         time[:] = date2num(self.dates, time.units, calendar=time.calendar)
         
         # Create depth coordinate 
-        z = dataset.createVariable('depth',np.float64,(zdim.name,))
+        z = dataset.createVariable('depth',np.float64,(zdim._name,))
         z.units = 'm'
         z[:] = self.z
 
         # Create streamfunction variable
-        sf = dataset.createVariable('stream_function_mar',np.float64,(tdim.name, zdim.name))
+        sf = dataset.createVariable('stream_function_mar',np.float64,(tdim._name, zdim._name))
         sf.units = 'Sv'
         sf[:] = self.sf
 
@@ -246,25 +246,25 @@ class VolumeTransportObs(TransportObs):
         tdim = dataset.createDimension('time', None)
         
         # Create time coordinate
-        time = dataset.createVariable('time',np.float64,(tdim.name,))
+        time = dataset.createVariable('time',np.float64,(tdim._name,))
         time.units = 'hours since 0001-01-01 00:00:00.0'
         time.calendar = 'gregorian'
         time[:] = date2num(self.dates, time.units, calendar=time.calendar)
 
         # Create variables
-        ek = dataset.createVariable('t_ek10',np.float64,(tdim.name,))
+        ek = dataset.createVariable('t_ek10',np.float64,(tdim._name,))
         ek.units = 'Sv'
         ek[:] = self.ekman
 
-        umo = dataset.createVariable('t_umo10',np.float64,(tdim.name,))
+        umo = dataset.createVariable('t_umo10',np.float64,(tdim._name,))
         umo.units = 'Sv'
         umo[:] = self.umo
 
-        fc = dataset.createVariable('t_gs10',np.float64,(tdim.name,))
+        fc = dataset.createVariable('t_gs10',np.float64,(tdim._name,))
         fc.units = 'Sv'
         fc[:] = self.fc
 
-        moc = dataset.createVariable('t_moc_mar_hc10',np.float64,(tdim.name,))
+        moc = dataset.createVariable('t_moc_mar_hc10',np.float64,(tdim._name,))
         moc.units = 'Sv'
         moc[:] = self.moc
         
@@ -380,62 +380,62 @@ class HeatTransportObs(TransportObs):
         zdim = dataset.createDimension('depth', self.z.size)
 
         # Create time coordinate
-        time = dataset.createVariable('time',np.float64,(tdim.name,))
+        time = dataset.createVariable('time',np.float64,(tdim._name,))
         time.units = 'hours since 0001-01-01 00:00:00.0'
         time.calendar = 'gregorian'
         time[:] = date2num(self.dates, time.units, calendar=time.calendar)
         
         # Create depth coordinate 
-        z = dataset.createVariable('depth',np.float64,(zdim.name,))
+        z = dataset.createVariable('depth',np.float64,(zdim._name,))
         z.units = 'm'
         z[:] = self.z
 
         # Create variables
-        q_eddy = dataset.createVariable('Q_eddy',np.float64,(tdim.name,))
+        q_eddy = dataset.createVariable('Q_eddy',np.float64,(tdim._name,))
         q_eddy.units = 'PW'
         q_eddy[:] = self.q_eddy
 
-        q_ek = dataset.createVariable('Q_ek',np.float64,(tdim.name,))
+        q_ek = dataset.createVariable('Q_ek',np.float64,(tdim._name,))
         q_ek.units = 'PW'
         q_ek[:] = self.q_ek
 
-        q_fc = dataset.createVariable('Q_fc',np.float64,(tdim.name,))
+        q_fc = dataset.createVariable('Q_fc',np.float64,(tdim._name,))
         q_fc.units = 'PW'
         q_fc[:] = self.q_fc
 
-        q_gyre = dataset.createVariable('Q_gyre',np.float64,(tdim.name,))
+        q_gyre = dataset.createVariable('Q_gyre',np.float64,(tdim._name,))
         q_gyre.units = 'PW'
         q_gyre[:] = self.q_gyre
 
-        q_geoint = dataset.createVariable('Q_int',np.float64,(tdim.name,))
+        q_geoint = dataset.createVariable('Q_int',np.float64,(tdim._name,))
         q_geoint.units = 'PW'
         q_geoint[:] = self.q_geoint
 
-        q_mo = dataset.createVariable('Q_mo',np.float64,(tdim.name,))
+        q_mo = dataset.createVariable('Q_mo',np.float64,(tdim._name,))
         q_mo.units = 'PW'
         q_mo[:] = self.q_mo
 
-        q_ot = dataset.createVariable('Q_ot',np.float64,(tdim.name,))
+        q_ot = dataset.createVariable('Q_ot',np.float64,(tdim._name,))
         q_ot.units = 'PW'
         q_ot[:] = self.q_ot
 
-        q_sum = dataset.createVariable('Q_sum',np.float64,(tdim.name,))
+        q_sum = dataset.createVariable('Q_sum',np.float64,(tdim._name,))
         q_sum.units = 'PW'
         q_sum[:] = self.q_sum
 
-        q_wbw = dataset.createVariable('Q_wedge',np.float64,(tdim.name,))
+        q_wbw = dataset.createVariable('Q_wedge',np.float64,(tdim._name,))
         q_wbw.units = 'PW'
         q_wbw[:] = self.q_wbw
 
-        t_basin = dataset.createVariable('T_basin',np.float64,(tdim.name,zdim.name,))
+        t_basin = dataset.createVariable('T_basin',np.float64,(tdim._name,zdim._name,))
         t_basin.units = 'degC'
         t_basin[:] = self.t_basin
 
-        v_basin = dataset.createVariable('V_basin',np.float64,(tdim.name,zdim.name,))
+        v_basin = dataset.createVariable('V_basin',np.float64,(tdim._name,zdim._name,))
         v_basin.units = 'Sv/m'
         v_basin[:] = self.v_basin
 
-        v_fc = dataset.createVariable('V_fc',np.float64,(tdim.name,zdim.name,))
+        v_fc = dataset.createVariable('V_fc',np.float64,(tdim._name,zdim._name,))
         v_fc.units = 'Sv/m'
         v_fc[:] = self.v_fc
 
@@ -505,13 +505,13 @@ class FloridaCurrentObs(TransportObs):
         tdim = dataset.createDimension('time', None)
 
         # Create time coordinate
-        time = dataset.createVariable('time',np.float64,(tdim.name,))
+        time = dataset.createVariable('time',np.float64,(tdim._name,))
         time.units = 'hours since 0001-01-01 00:00:00.0'
         time.calendar = 'gregorian'
         time[:] = date2num(self.dates, time.units, calendar=time.calendar)
  
         # Create variables
-        fc = dataset.createVariable('florida_current_transport',np.float64,(tdim.name,))
+        fc = dataset.createVariable('florida_current_transport',np.float64,(tdim._name,))
         fc.units = 'Sv'
         fc[:] = self.fc
 
