@@ -4,9 +4,14 @@ Module holding code to work with ocean sections
 """
 
 from math import radians, cos, sin, asin, sqrt
-from netCDF4 import MFTime, MFDataset, num2date
+from netCDF4 import MFTime, MFDataset, Dataset, num2date
 import numpy as np
 import copy
+import glob
+
+
+class NetCDF4Error(Exception):
+    pass
 
 class MaskError(Exception):
     pass
@@ -267,6 +272,19 @@ class ZonalSections(object):
                 
         return bounds
 
+    def _opennc(self, f):
+        """ Open netcdf data set either Dataset or MFDataset. """
+        if len(glob.glob(f)) > 1:
+            try:
+                nc = MFDataset(f)
+            except ValueError as err:
+                print 'netcdf4.MFDataset incompatible with NETCDF4. Try concatenating data into a single file.'
+                raise NetCDF4ERROR(err)
+        else:
+            nc = Dataset(f)
+
+        return nc
+
     def _apply_meridional_average(self):
         """ Average data across j-indices """
         if self.surface_field:
@@ -287,7 +305,7 @@ class ZonalSections(object):
 
     def _read_mask(self):
         """ Read mask data from netcdf file(s) """
-        nc = MFDataset(self.maskf)
+        nc = self._opennc(self.maskf)
         ncvar = nc.variables[self.maskvar]        
         if ncvar.ndim == 4: # If time dim present in mask field
             mask = ncvar[0,:,self.j1:self.j2+1, self.i1:self.i2+1] == self.maskmdi
@@ -298,7 +316,7 @@ class ZonalSections(object):
  
     def _read_data(self):
         """ Read data from netcdf file(s) """
-        nc = MFDataset(self.f)
+        nc = self._opennc(self.f)
         ncvar = nc.variables[self.var]
         if self.surface_field:
             self.data = ncvar[:, self.j1:self.j2+1, self.i1:self.i2+1]
@@ -312,7 +330,7 @@ class ZonalSections(object):
 
     def _read_xcoord(self):
         """ Read longitude data in decimal degrees from netcdf file(s). """
-        nc = MFDataset(self.f)
+        nc = self._opennc(self.f)
         ncvar = nc.variables[self.xcoord]
         
         if ncvar.ndim == 2:
@@ -330,7 +348,7 @@ class ZonalSections(object):
         
     def _read_ycoord(self):
         """ Read latitude data in decimal degrees from netcdf file(s) """
-        nc = MFDataset(self.f)
+        nc = self._opennc(self.f)
         ncvar = nc.variables[self.ycoord]
         if ncvar.ndim == 2:
             self.y = ncvar[self.j1:self.j2+1,self.i1:self.i2+1]
@@ -341,16 +359,24 @@ class ZonalSections(object):
         
     def _read_tcoord(self):
         """ Read time coordinate information from netcdf file(s) """
-        nc = MFDataset(self.f)
+        nc = self._opennc(self.f)
         t = nc.variables[self.tcoord]
-        self.dates = num2date(MFTime(t)[:], calendar=t.calendar, units=t.units)
-
+        
+        if len(glob.glob(self.f)) > 1:
+            try:
+                self.dates = num2date(MFTime(t)[:], calendar=t.calendar, units=t.units)
+            except:
+                print 'netcdf4.MFTime incompatible with NETCDF4. Try concatenating data into a single file.'
+                raise NetCDF4ERROR(err)
+        else:
+            self.dates = num2date(t[:], calendar=t.calendar, units=t.units)            
+            
     def _read_zcoord(self):
         """ Read z coordinate data from netcdf file(s) """
         if self.surface_field:
             self.z = None
         else:
-            nc = MFDataset(self.f)
+            nc = self._opennc(self.f)
             self.z = np.abs(nc.variables[self.zcoord][:])
             nc.close()
 
