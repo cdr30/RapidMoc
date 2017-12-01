@@ -110,13 +110,13 @@ from netCDF4 import Dataset
 import rapidmoc.observations as rapidobs
 import rapidmoc.plotdiag as rapidplot
 
-obs_oht = rapidobs.HeatTransportObs(obs_oht_f, time_avg=time_avg, mindt=mindt, maxdt=maxdt)
-obs_fc = rapidobs.FloridaCurrentObs(obs_fc_f, time_avg=time_avg)
-obs_sf = rapidobs.StreamFunctionObs(obs_sf_f, time_avg=time_avg)
-obs_vol = rapidobs.VolumeTransportObs(obs_vol_f, time_avg=time_avg)
+obs_oht = rapidobs.HeatTransportObs(obs_oht_filename, time_avg=time_avg, mindt=mindt, maxdt=maxdt)
+obs_fc = rapidobs.FloridaCurrentObs(obs_fc_filename, time_avg=time_avg)
+obs_sf = rapidobs.StreamFunctionObs(obs_sf_filename, time_avg=time_avg)
+obs_vol = rapidobs.VolumeTransportObs(obs_vol_filename, time_avg=time_avg)
 trans = Dataset('model_meridional_transports_at_26N.nc')
 
-rapidplot.plot_diagnostics(trans, name='simulated', basename='', 
+rapidplot.plot_diagnostics(trans, name='simulated', outdir='./', 
 				      obs_sf=obs_sf, obs_oht=obs_oht,
 				      obs_vol=obs_vol, obs_fc=obs_fc)
 
