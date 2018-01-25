@@ -201,7 +201,6 @@ reference_salinity = reference salinity used in calculation of equivalent freshw
 
 [output]
 date_format = format string used with datetime.strftime, e.g. '%Y%m%d' [string]
-name = descriptive string used to describe model experiment [string]
 plot = boolean used to enable/disable plotting [boolean] 
 outdir = path to output directory where data/plots are saved [string]
 ```
