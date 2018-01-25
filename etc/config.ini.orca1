@@ -73,5 +73,4 @@ reference_salinity = 35.17
 [output]
 date_format=%Y
 plot=True
-name=orca1
 outdir=/home/rd/necr/tmp/rapidmoc/
