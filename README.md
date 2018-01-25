@@ -121,12 +121,28 @@ rapidplot.plot_diagnostics(trans, name='simulated', outdir='./',
 				      obs_vol=obs_vol, obs_fc=obs_fc)
 
 ```
-
 Example plots are included at the end of this document. Time-averaged observations can also be written to netcdf for later analysis.
 
 ```
 obs.write_to_netcdf(netcdf_file_name)
 
+```
+
+## Plotting with `plot_rapidmoc.py`
+The plotting API described above is also available through the script `plot_rapidmoc.py', which can be invoked from the command line as follows;
+
+```
+usage: plot_rapidmoc.py [-h] [--name NAME] configf datafile
+
+Plot RapidMoc time series data.
+
+positional arguments:
+  configf      RapidMoc config file containing paths to observational data
+  datafile     Output netcdf file created by RapidMoc
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --name NAME  Name to use in plots and output files
 ```
 
 ## Configuration files
