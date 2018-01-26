@@ -339,7 +339,7 @@ def plot_moc_vs_oht(trans, basename='', name='simulated', obs_vol=None, obs_oht=
     fig.add_subplot(1,3,1)
 
     dts = utils.get_ncdates(trans)
-    moc_model = trans.variables['moc_rapid'][:]
+    moc_model = trans.variables['moc_model'][:]
     q_sum_model = trans.variables['q_sum_model'][:]
     q_gyre_model = trans.variables['q_gyre_model'][:]
     q_ot_model = trans.variables['q_ot_model'][:]
@@ -687,7 +687,7 @@ def plot_moc_vs_oft(trans, basename='', name='simulated', obs_vol=None, obs_oft=
     fig.add_subplot(1,3,1)
 
     dts = utils.get_ncdates(trans)
-    moc_model = trans.variables['moc_rapid'][:]
+    moc_model = trans.variables['moc_model'][:]
     fw_sum_model = trans.variables['fw_sum_model'][:]
     fw_gyre_model = trans.variables['fw_gyre_model'][:]
     fw_ot_model = trans.variables['fw_ot_model'][:]
