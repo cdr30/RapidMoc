@@ -30,7 +30,7 @@ def get_args():
     parser.add_argument(
         'vfile', type=str, help='Path for netcdf file(s) containing meridional velocity data.')
     parser.add_argument(
-        '--name', type=str, help='Name used in output files.', default='RapidMoc')
+        '--name', help='Name used in output files. Overrides value in config file.', default=None)
     args = parser.parse_args()
 
     return args
@@ -93,7 +93,8 @@ def main():
     config = get_config(args)
 
     # Update name in config file
-    config.set('output', 'name', args.name)
+    if args.name is not None:
+        config.set('output', 'name', args.name)
 
     # Read data
     t = sections.ZonalSections(args.tfile, config, 'temperature')
