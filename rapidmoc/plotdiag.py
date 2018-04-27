@@ -22,7 +22,7 @@ c1='#a6cee3'
 c2='#1f78b4'
 c3='#b2df8a'
 c4='#33a02c'
-
+MAX_NAME_LEN=15
 
 def plot_streamfunctions(trans, name='simulated', basename='', obs=None,lw=4):
     """ Plot time mean overturning stream functions"""
@@ -1015,7 +1015,8 @@ def plot_diagnostics(trans, name='simulated', outdir='./', date_format='%Y%m%d',
     # Create basename for output files
     dts = utils.get_ncdates(trans)
     basename = utils.get_savename(outdir, name, dts, date_format,suffix='_')
-    
+    name = name[0:MAX_NAME_LEN]
+
     # Plot data
     plot_streamfunctions(trans, basename=basename, name=name, obs=obs_sf,lw=lw)
     plot_streamfunction_hovmollers(trans, basename=basename, name=name, obs=obs_sf)
