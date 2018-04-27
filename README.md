@@ -197,6 +197,7 @@ j2 = maximum index in y coordinate used to extract zonal section from tfile/sfil
 maskf = path to netcdf file containing explicit data mask [string, optional]
 maskvar = netcdf variable name for mask in maskf [string, optional]
 maskmdi = missing data indicator for maskvar [float, optional]
+fill_missing_coords = if True, infill missing coordinate info (e.g. over land) by linear interpolation. [boolean, optional, default=False]
 
 [observations] 
 heat_transports = path to mocha mht data.nc [string, optional]

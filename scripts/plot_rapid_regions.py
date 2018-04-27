@@ -51,6 +51,7 @@ def main(configf, vfile, name):
     # Load velocity data
     v = sections.ZonalSections(vfile, config, 'meridional_velocity')
     lons = v.x
+    lat = np.mean(v.y)
     z_scaled = -np.sqrt(np.abs(v.z))
     
     if len(v.data.shape) == 3:
@@ -72,8 +73,8 @@ def main(configf, vfile, name):
     plt.xlabel('Longitude')
     plt.ylabel('Depth (m)')
     plt.yticks(zticks, zlabels)
-    plt.title('Meridional velocity in %s\n Black lines indicate position of fc_minlon, fc_maxlon, wbw_maxlon' % 
-              name)
+    plt.title('Meridional velocity in %s (latitude=%4.1f)\n Black lines indicate position of fc_minlon, fc_maxlon, wbw_maxlon' % 
+              (name, lat))
     plt.colorbar()
     plt.show()
     
