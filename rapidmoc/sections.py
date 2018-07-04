@@ -386,7 +386,7 @@ class ZonalSections(object):
             self.y = ncvar[self.j1:self.j2+1,self.i1:self.i2+1]
         else:
              # Dummy j-index for averaging
-            self.y = ncvar[self.i1:self.i2+1][np.newaxis]
+            self.y = ncvar[self.j1:self.j2+1][:,np.newaxis]
         nc.close()
         
     def _read_tcoord(self):
