@@ -135,7 +135,7 @@ class ZonalSections(object):
         if self.surface_field:
             return None
         else:
-            return self._get_bounds(self.z)
+            return self._get_zbounds(self.z)
 
     @property 
     def mask(self):
@@ -279,6 +279,21 @@ class ZonalSections(object):
                 bounds[nbound] = 0.5 * (data[nbound] + data[nbound-1]) 
         
         return bounds
+
+
+    def _get_zbounds(self, z):
+        """ Calculate zbounds from z=0 using mid-points """
+        nmax = len(z) + 1
+        zbounds = np.zeros(nmax)       
+        
+        for nbound in range(nmax):
+            nz = nbound - 1
+            if nbound == 0:
+                zbounds[nbound] = 0
+            else:
+                zbounds[nbound] = 2 * z[nz] - zbounds[nbound-1]
+        return zbounds
+
 
     def _opennc(self, f):
         """ Open netcdf data set either Dataset or MFDataset. """
