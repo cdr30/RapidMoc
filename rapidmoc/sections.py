@@ -97,7 +97,6 @@ class ZonalSections(object):
                     
         self._apply_meridional_average()
 
-
     @property
     def cell_widths(self):
         """ Return width of cells along section """
@@ -136,7 +135,7 @@ class ZonalSections(object):
         if self.surface_field:
             return None
         else:
-            return self._get_bounds(self.z)
+            return self._get_zbounds(self.z)
 
     @property 
     def mask(self):
@@ -281,6 +280,21 @@ class ZonalSections(object):
         
         return bounds
 
+
+    def _get_zbounds(self, z):
+        """ Calculate zbounds from z=0 using mid-points """
+        nmax = len(z) + 1
+        zbounds = np.zeros(nmax)       
+        
+        for nbound in range(nmax):
+            nz = nbound - 1
+            if nbound == 0:
+                zbounds[nbound] = 0
+            else:
+                zbounds[nbound] = 2 * z[nz] - zbounds[nbound-1]
+        return zbounds
+
+
     def _opennc(self, f):
         """ Open netcdf data set either Dataset or MFDataset. """
         if len(glob.glob(f)) > 1:
@@ -385,8 +399,7 @@ class ZonalSections(object):
         if ncvar.ndim == 2:
             self.y = ncvar[self.j1:self.j2+1,self.i1:self.i2+1]
         else:
-             # Dummy j-index for averaging
-            self.y = ncvar[self.j1:self.j2+1][:,np.newaxis]
+            self.y = ncvar[self.j1:self.j2+1][:,np.newaxis] * np.ones(self.i2-self.i1+1)[np.newaxis]
         nc.close()
         
     def _read_tcoord(self):
