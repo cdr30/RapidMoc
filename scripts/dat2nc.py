@@ -1,14 +1,8 @@
-#!/usr/bin/env python2.7 
+#!/usr/bin/env python3
 
 """ 
-DESCRIPTION:
   Convert text data files containing Florida current 
   observations into netcdf data files
-
-AUTHOR:
-
-  Chris Roberts     ECMWF     2017
-
 """
 
 import argparse
@@ -67,7 +61,7 @@ def create_netcdf(savef, dts, dat):
     fc[:] = dat
     
     # close file
-    print 'SAVING: %s' % savef 
+    print('SAVING: %s' % savef)
     dataset.close()
     
 

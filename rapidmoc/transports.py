@@ -6,8 +6,8 @@ Module containing code to work with ocean transports
 import numpy as np
 import copy
 
-import output
-import utils
+from . import output
+from . import utils
 
 # Constants
 G = 9.81          # Gravitational acceleration (m/s2)
@@ -25,9 +25,9 @@ class Transports(object):
         self.name = v.name
         self.v = v.data[:,:,minind:maxind]
         self.t = t_on_v.data[:,:,minind:maxind]
-	self.s = s_on_v.data[:,:,minind:maxind]
+        self.s = s_on_v.data[:,:,minind:maxind]
         self.rhocp = RHO_REF * CP
-	self.sref = sref
+        self.sref = sref
         self.x = v.x[minind:maxind]        
         self.y = v.y[minind:maxind]
         self.z = v.z
@@ -40,7 +40,7 @@ class Transports(object):
         
         # Set null values for property attributes
         self._avg_t = None
-	self._avg_s = None
+        self._avg_s = None
         self._avg_v = None
         self._v_no_net = None
         self._net_transport = None

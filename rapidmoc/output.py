@@ -8,7 +8,7 @@ from netCDF4 import Dataset, date2num
 import numpy as np
 import os
 
-import utils
+from . import utils
 
                
 def open_ncfile(config, dates):

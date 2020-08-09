@@ -1,25 +1,20 @@
-#!/usr/bin/env python2.7 
+#!/usr/bin/env python3
 
 """ 
-DESCRIPTION:
   Plot meridional currents at RAPID section and overly with specified 
   values for fc_minlon, fc_maxlon and wbw_maxlon.
-
-AUTHOR:
-
-  Chris Roberts     ECMWF     2017
-
 """
-
+import matplotlib
 import argparse
 import numpy as np
-import ConfigParser
+import configparser
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 
 import rapidmoc.sections as sections
 import rapidmoc.plotdiag as rapidplot
 
+matplotlib.use("TkAgg")
 
 def get_args():
     """   Get arguments from command line.  """
@@ -40,7 +35,7 @@ def main(configf, vfile, name):
     """ Plot meridional currents at RAPID section and region boundaries. """
 
     # Read config file
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(configf)
 
     # Read boundaries of RAPID regions
