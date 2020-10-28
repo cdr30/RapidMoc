@@ -83,7 +83,7 @@ class ZonalSections(object):
             mask = self._read_mask()
             self._update_data_mask(mask)
         elif hasattr(self.data, 'mask'):
-            print "%s: using mask information from %s." % (self.var, self.f)
+            print("%s: using mask information from %s." % (self.var, self.f))
         else:
             raise MaskError('Mask information must be specified')
         
@@ -301,7 +301,8 @@ class ZonalSections(object):
             try:
                 nc = MFDataset(f)
             except ValueError as err:
-                print 'netcdf4.MFDataset incompatible with NETCDF4. Try concatenating data into a single file.'
+                print('netcdf4.MFDataset incompatible with NETCDF4.'
+                      'Try concatenating data into a single file.')
                 raise NetCDF4ERROR(err)
         else:
             nc = Dataset(f)
@@ -411,7 +412,8 @@ class ZonalSections(object):
             try:
                 self.dates = num2date(MFTime(t)[:], calendar=t.calendar, units=t.units)
             except:
-                print 'netcdf4.MFTime incompatible with NETCDF4. Try concatenating data into a single file.'
+                print('netcdf4.MFTime incompatible with NETCDF4.'
+                      'Try concatenating data into a single file.')
                 raise NetCDF4ERROR(err)
         else:
             self.dates = num2date(t[:], calendar=t.calendar, units=t.units)            

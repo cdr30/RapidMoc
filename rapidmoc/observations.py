@@ -6,7 +6,8 @@ Module containing code to work with Rapid observational data
 from netCDF4 import Dataset, num2date, date2num
 import datetime
 import numpy as np
-import utils
+
+from . import utils
 
 class TransportObs(object):
     """ Template class to interface with observed ocean transports """
@@ -125,7 +126,7 @@ class StreamFunctionObs(TransportObs):
             self.sf = self._calc_ym(self._readnc('stream_function_mar').transpose(),
                                      profile=True)
         else:
-            print self.time_avg
+            print(self.time_avg)
             raise ValueError('time_avg must be "monthly" or "yearly"')
             
         if (self.mindt is not None) and (self.maxdt is not None):
@@ -168,7 +169,7 @@ class StreamFunctionObs(TransportObs):
         sf[:] = self.sf
 
         # Close file
-        print 'SAVING: %s' % ncfile
+        print('SAVING: %s' % ncfile)
         dataset.close()
         
 
@@ -217,7 +218,7 @@ class VolumeTransportObs(TransportObs):
             self.fc = self._calc_ym(self._readnc('t_gs10'))
             self.moc = self._calc_ym(self._readnc('moc_mar_hc10'))
         else:
-            print self.time_avg
+            print(self.time_avg)
             raise ValueError('time_avg must be "monthly" or "yearly"')
         
         if (self.mindt is not None) and (self.maxdt is not None):
@@ -269,7 +270,7 @@ class VolumeTransportObs(TransportObs):
         moc[:] = self.moc
         
         # Close file
-        print 'SAVING: %s' % ncfile
+        print('SAVING: %s' % ncfile)
         dataset.close()
 
 
@@ -338,7 +339,7 @@ class HeatTransportObs(TransportObs):
             self.v_basin = self._calc_ym(self._readnc('V_basin'), profile=True)
             self.v_fc = self._calc_ym(self._readnc('V_fc'), profile=True)
         else:
-            print self.time_avg
+            print(self.time_avg)
             raise ValueError('time_avg must be "monthly" or "yearly"')
  
         if (self.mindt is not None) and (self.maxdt is not None):
@@ -440,7 +441,7 @@ class HeatTransportObs(TransportObs):
         v_fc[:] = self.v_fc
 
         # Close file
-        print 'SAVING: %s' % ncfile
+        print('SAVING: %s' % ncfile)
         dataset.close()
 
                     
@@ -478,7 +479,7 @@ class FloridaCurrentObs(TransportObs):
             self.dates = self._ym_dates()
             self.fc = self._calc_ym(self._readnc('florida_current_transport'))
         else:
-            print self.time_avg
+            print(self.time_avg)
             raise ValueError('time_avg must be "monthly" or "yearly"')
   
         if (self.mindt is not None) and (self.maxdt is not None):
@@ -516,5 +517,5 @@ class FloridaCurrentObs(TransportObs):
         fc[:] = self.fc
 
         # Close file
-        print 'SAVING: %s' % ncfile
+        print('SAVING: %s' % ncfile)
         dataset.close()

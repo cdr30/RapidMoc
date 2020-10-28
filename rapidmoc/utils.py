@@ -3,22 +3,29 @@ Module containing utility functions
 
 """
 
-
+import cftime
+import datetime
 import numpy as np
 import os
-from netCDF4 import num2date
+
 
 class ShapeError(Exception):
     pass
 
 
-
 def get_ncdates(nc, tvar='time'):
-    """ Return dates from nercdf time coordinate """
+    """ Return dates from netcdf time coordinate """
     t = nc.variables[tvar]
-    dts = num2date(t[:], t.units, calendar=t.calendar)
-    
-    return dts
+    dts = cftime.num2date(t[:], t.units, calendar=t.calendar)
+    # Matplotlib does not support the real_datetime format returned by cftime. Furthermore, 
+    # it is not possible to create datetime.datetime directly (i.e. using cftime.num2pydate)
+    # for certain calendars (e.g. Gregorian). The nc-time-axis package extends matplotlib 
+    # to work directly with cftime objects. However, to avoid this additional dependency, 
+    # we manually create the python datetime objects from cftime objects. 
+    pydts = np.array([
+        datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+        for dt in dts])
+    return pydts
 
 
 def get_datestr(dates, date_format):

@@ -1,17 +1,8 @@
-#!/usr/bin/env python2.7 
+#!/usr/bin/env python3
 
-""" 
-DESCRIPTION:
-  Plot data created by RapidMoc against observations. 
-
-AUTHOR:
-
-  Chris Roberts     ECMWF     2017
-
-"""
 
 import argparse
-import ConfigParser
+import configparser
 from netCDF4 import Dataset
 
 import rapidmoc.observations as rapidobs
@@ -21,7 +12,7 @@ import rapidmoc.plotdiag as rapidplot
 def get_args():
     """   Get arguments from command line.  """
     parser = argparse.ArgumentParser(
-        description=' Plot RapidMoc time series data.')
+        description=' Plot RapidMoc time series data against observations.')
     parser.add_argument(
         'configf', help='RapidMoc config file containing paths to observational data')
     parser.add_argument(
@@ -38,7 +29,7 @@ def main(args):
     """ Plot meridional currents at RAPID section and region boundaries. """
 
     # Read config file
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(args.configf)
     obs_oht_f = config.get('observations', 'heat_transports')
     obs_vol_f = config.get('observations', 'volume_transports')

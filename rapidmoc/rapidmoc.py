@@ -5,14 +5,14 @@ Module containing main routines to execute RapidMoc
 
 
 import argparse
-import ConfigParser
+import configparser
 import copy
 
 
-import sections
-import transports
-import observations
-import plotdiag
+from . import sections
+from . import transports
+from . import observations
+from . import plotdiag
 
 
 def get_args():
@@ -41,7 +41,7 @@ def get_args():
 
 def get_config(args):
     """ Return configuration options as <ConfigParser> object. """
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(args.config_file)
 
     return config
@@ -121,6 +121,6 @@ def main():
         call_plotdiag(config, trans)
         
     # Write data
-    print 'SAVING: %s' % trans.filepath()
+    print('SAVING: %s' % trans.filepath())
     trans.close()
 

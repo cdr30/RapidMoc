@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 """
 Script used to execute RapidMoc package from command line.
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt as err:
-        print err
+        print(err)
         sys.exit()
         
         

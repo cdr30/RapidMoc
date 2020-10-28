@@ -29,7 +29,7 @@ for YEAR in $(seq $MINYR $MAXYR); do
   wget http://www.aoml.noaa.gov/phod/floridacurrent/FC_cable_transport_${YEAR}.dat
   
   if [[ $? = 0 ]]; then
-    python2.7 dat2nc.py FC_cable_transport_${YEAR}.dat
+    python3 dat2nc.py FC_cable_transport_${YEAR}.dat
     NCFILES="$NCFILES FC_cable_transport_${YEAR}.dat.nc"
   else
     echo "ERROR: could not retrieve http://www.aoml.noaa.gov/phod/floridacurrent/FC_cable_transport_${YEAR}.dat"
