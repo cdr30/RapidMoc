@@ -10,6 +10,8 @@ import copy
 import glob
 import pandas as pd
 
+from . import utils
+
 class NetCDF4Error(Exception):
     pass
 
@@ -410,14 +412,16 @@ class ZonalSections(object):
         
         if len(glob.glob(self.f)) > 1:
             try:
-                self.dates = num2date(MFTime(t)[:], calendar=t.calendar, units=t.units)
+                dts = num2date(MFTime(t)[:], calendar=t.calendar, units=t.units)
+                self.dates = utils.convert_to_datetime(dts)
             except:
                 print('netcdf4.MFTime incompatible with NETCDF4.'
                       'Try concatenating data into a single file.')
                 raise NetCDF4ERROR(err)
         else:
-            self.dates = num2date(t[:], calendar=t.calendar, units=t.units)            
-            
+            dts = num2date(t[:], calendar=t.calendar, units=t.units)            
+            self.dates = utils.convert_to_datetime(dts)
+
     def _read_zcoord(self):
         """ Read z coordinate data from netcdf file(s) """
         if self.surface_field:

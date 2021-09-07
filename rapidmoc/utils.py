@@ -22,9 +22,15 @@ def get_ncdates(nc, tvar='time'):
     # for certain calendars (e.g. Gregorian). The nc-time-axis package extends matplotlib 
     # to work directly with cftime objects. However, to avoid this additional dependency, 
     # we manually create the python datetime objects from cftime objects. 
+    pydts = convert_to_datetime(dts)
+    return pydts
+
+
+def convert_to_datetime(dates):
+    """ Convert cftime dates to datetime object """
     pydts = np.array([
         datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
-        for dt in dts])
+        for dt in dates])
     return pydts
 
 
